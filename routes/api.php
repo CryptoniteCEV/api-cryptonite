@@ -3,6 +3,11 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+use App\Model\UserController;
+use App\Model\WalletController;
+use App\Model\TradeController;
+use App\Model\ScoreController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -14,6 +19,35 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+Route::prefix('users')->group(function () {
+	Route::post('/register',[UserController::class, 'registerUser']);
+	Route::post('/login',[UserController::class, 'loginUser']);
+	Route::post('/restore/password',[UserController::class, 'restorePassword']);
+	Route::post('/update/password',[UserController::class, 'changePassword'])->middleware('EnsureTokenIsValid');
+	Route::get('profile/info',[UserController::class, 'profileInfo'])->middleware('EnsureTokenIsValid');
+	Route::get('user/info/{id}',[UserController::class, 'followingInfo'])->middleware('EnsureTokenIsValid');
+	Route::post('/update/profile',[UserController::class, 'updateProfile'])->middleware('EnsureTokenIsValid');
+	Route::post('/follow/{username}',[UserController::class, 'followUser'])->middleware('EnsureTokenIsValid');
+	Route::get('/followings/list',[UserController::class, 'followingsList'])->middleware('EnsureTokenIsValid');
+	Route::post('/update/exp/{newExp}',[UserController::class, 'updateExp'])->middleware('EnsureTokenIsValid');
+	Route::post('/update/lvl/{newLvl}',[UserController::class, 'updateLvl'])->middleware('EnsureTokenIsValid');
+	Route::post('/trade',[UserController::class, 'tradeCoins'])->middleware('EnsureTokenIsValid');
+	Route::get('/followers',[UserController::class, 'getFollowers'])->middleware('EnsureTokenIsValid');
+
+});
+
+Route::prefix('scores')->group(function () {
+	Route::get('/list',[ScoreController::class, 'scoreList'])->middleware('EnsureTokenIsValid');
+
+});
+
+Route::prefix('trades')->group(function () {
+	Route::get('/history',[TradeController::class, 'tradeHistory'])->middleware('EnsureTokenIsValid');
+
+});
+
+Route::prefix('wallets')->group(function () {
+	Route::post('/deposit',[WalletController::class, 'deposit'])->middleware('EnsureTokenIsValid');
+	Route::get('/info',[WalletController::class, 'walletInfo'])->middleware('EnsureTokenIsValid');
+
 });
