@@ -15,6 +15,9 @@ class CreateScoresTable extends Migration
     {
         Schema::create('scores', function (Blueprint $table) {
             $table->id();
+            $table->integer('experience');
+            $table->tinyInteger('level');
+            $table->foreignId('user_id')->constrained()->onDelete('Cascade');
             $table->timestamps();
         });
     }

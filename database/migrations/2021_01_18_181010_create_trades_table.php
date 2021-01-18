@@ -15,6 +15,10 @@ class CreateTradesTable extends Migration
     {
         Schema::create('trades', function (Blueprint $table) {
             $table->id();
+            $table->integer('price');
+            $table->integer('quantity');
+            $table->foreignId('user_id')->constrained()->onDelete('Cascade');
+            $table->foreignId('currency_id')->constrained();
             $table->timestamps();
         });
     }
