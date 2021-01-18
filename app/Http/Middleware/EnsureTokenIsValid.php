@@ -18,7 +18,7 @@ class EnsureTokenIsValid
      */
     public function handle(Request $request, Closure $next)
     {
-        define("ADMIN","User");
+        define("ADMIN","Administrator");
         
         $key = MyJWT::getKey();
 
