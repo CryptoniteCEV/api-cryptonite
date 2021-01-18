@@ -3,10 +3,10 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-use App\Model\UserController;
-use App\Model\WalletController;
-use App\Model\TradeController;
-use App\Model\ScoreController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\WalletController;
+use App\Http\Controllers\TradeController;
+use App\Http\Controllers\ScoreController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,8 +20,8 @@ use App\Model\ScoreController;
 */
 
 Route::prefix('users')->group(function () {
-	Route::post('/register',[UserController::class, 'registerUser']);
-	Route::post('/login',[UserController::class, 'loginUser']);
+	Route::post('/register',[UserController::class, 'register']);
+	Route::post('/login',[UserController::class, 'login']);
 	Route::post('/restore/password',[UserController::class, 'restorePassword']);
 	Route::post('/update/password',[UserController::class, 'changePassword'])->middleware('EnsureTokenIsValid');
 	Route::get('profile/info',[UserController::class, 'profileInfo'])->middleware('EnsureTokenIsValid');
