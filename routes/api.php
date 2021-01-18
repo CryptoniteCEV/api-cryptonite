@@ -8,16 +8,6 @@ use App\Http\Controllers\WalletController;
 use App\Http\Controllers\TradeController;
 use App\Http\Controllers\ScoreController;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
 
 Route::prefix('users')->group(function () {
 	Route::post('/register',[UserController::class, 'register']);
@@ -49,5 +39,12 @@ Route::prefix('trades')->group(function () {
 Route::prefix('wallets')->group(function () {
 	Route::post('/deposit',[WalletController::class, 'deposit'])->middleware('EnsureTokenIsValid');
 	Route::get('/info',[WalletController::class, 'walletInfo'])->middleware('EnsureTokenIsValid');
+
+});
+
+Route::prefix('currencies')->group(function () {
+
+    Route::get('/register',[WalletController::class, 'createCurrency'])->middleware('EnsureTokenIsValid');
+	Route::get('/list',[WalletController::class, 'getCoins'])->middleware('EnsureTokenIsValid');
 
 });
