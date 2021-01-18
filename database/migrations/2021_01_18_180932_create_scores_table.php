@@ -17,7 +17,7 @@ class CreateScoresTable extends Migration
             $table->id();
             $table->integer('experience');
             $table->tinyInteger('level');
-            $table->foreignId('user_id')->constrained()->onDelete('Cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
