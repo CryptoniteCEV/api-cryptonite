@@ -19,4 +19,7 @@ class MyJWT{
         return self::KEY;
     }
 
+    public static function generateToken($username){
+        return JWT::encode(generatePayload($username), self::KEY);
+    }
 }
