@@ -9,7 +9,6 @@ class user extends Model
 {
     use HasFactory;
 
-<<<<<<< HEAD
     public function score()
     {
         return $this->hasOne(Score::class);
@@ -22,9 +21,5 @@ class user extends Model
 
     public function wallet(){
         return $this->belongsToMany(currency::class, "wallets")->withPivot('quantity');
-=======
-    public function score(){
-    	return $this->hasOne(Score::class);
->>>>>>> fa7f48a510aa1a9cb3b84ded756ffcba8a66768f
     }
 }
