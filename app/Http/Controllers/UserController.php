@@ -5,11 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 use App\Models\User;
 
 use App\Http\Helpers\MyJWT;
 use \Firebase\JWT\JWT;
+
+
 
 class UserController extends Controller
 {
@@ -119,7 +122,7 @@ class UserController extends Controller
     /**POST
      * 
      */
-    public function change_password(){
+    public function change_password(Request $request){
         $response = "";
         //Leer el contenido de la petición
         $data = $request->getContent();
@@ -154,8 +157,55 @@ class UserController extends Controller
     /**GET
      * 
      */
-    public function profile_info(){
+    public function profile_info(Request $request){
+        $response = "";
+        //Decodificar el token
+        $headers = getallheaders();
+        $decoded = JWT::decode($headers['api_token'], $key, array('HS256'));
 
+        // Buscar el usuario 
+        $user = User::where('username', $decoded->username)->get()->first();
+
+        if($user){
+            $response = [
+                "username" => $user->username,
+                "name" => $user->name,
+                "surname" => $user->surname,
+                "email" => $user->email,
+                "profile_pic" => $user->profile_pic
+            ];
+
+        } else {
+            $response = "Ese usuario no existe";
+        }
+        // Enviar la respuesta
+        return $response;
+    }
+
+    /**GET
+     * 
+     */
+    public function following_info(Request $request, $id){
+        $response = "";
+
+        // Buscar el usuario 
+        $user = User::find($id);
+
+        if($user){
+            $trades = Trade::where('user_id', $id)->get();
+
+            $response = [
+                "username" => $user->username,
+                "profile_pic" => $user->profile_pic
+                
+                
+                
+            ];
+        } else {
+            $response = "Ese usuario no existe";
+        }
+        // Enviar la respuesta
+        return $response;
     }
 }
  

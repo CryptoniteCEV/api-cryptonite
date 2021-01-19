@@ -12,8 +12,8 @@ use App\Http\Controllers\ScoreController;
 Route::prefix('users')->group(function () {
 	Route::post('/register',[UserController::class, 'register']);
 	Route::post('/login',[UserController::class, 'login']);
-	Route::post('/restore/password',[UserController::class, 'restorePassword']);
-	Route::post('/update/password',[UserController::class, 'changePassword'])->middleware('EnsureTokenIsValid');
+	Route::post('/restore/password',[UserController::class, 'restore_password']);
+	Route::post('/update/password',[UserController::class, 'change_password'])->middleware('EnsureTokenIsValid');
 	Route::get('profile/info',[UserController::class, 'profileInfo'])->middleware('EnsureTokenIsValid');
 	Route::get('user/info/{id}',[UserController::class, 'followingInfo'])->middleware('EnsureTokenIsValid');
 	Route::post('/update/profile',[UserController::class, 'updateProfile'])->middleware('EnsureTokenIsValid');
