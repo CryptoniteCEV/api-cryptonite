@@ -9,7 +9,7 @@ class currency extends Model
 {
     use HasFactory;
 
-    public user() {
+    public function user(){
     	return $this->belongsToMany(User::class, "trades")->withPivot('quantity','price')->orderBy('created_at', 'desc');
     }
 }

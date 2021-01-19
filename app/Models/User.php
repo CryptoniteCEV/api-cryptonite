@@ -22,4 +22,5 @@ class user extends Model
     public function wallet(){
         return $this->belongsToMany(currency::class, "wallets")->withPivot('quantity');
     }
+
 }
