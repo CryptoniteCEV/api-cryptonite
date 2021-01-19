@@ -128,6 +128,7 @@ class UserController extends Controller
         $data = $request->getContent();
         //Decodificar el json
         $data = json_decode($data);
+        $key = MyJWT::getKey();
         //Decodificar el token
         $headers = getallheaders();
         $decoded = JWT::decode($headers['api_token'], $key, array('HS256'));
@@ -160,6 +161,7 @@ class UserController extends Controller
     public function profile_info(Request $request){
         $response = "";
         //Decodificar el token
+        $key = MyJWT::getKey();
         $headers = getallheaders();
         $decoded = JWT::decode($headers['api_token'], $key, array('HS256'));
 
@@ -204,14 +206,49 @@ class UserController extends Controller
             // HAY QUE REVISAR TODO ESTO, PROBABLEMENTE ES MEJOR PASARLO A TRADE Y HACERLO DESDE AHÍ
             //
             //
-            for ($i=0; $i < count($user->currency->pivot); $i++) { 
+            /*for ($i=0; $i < count($user->currency->pivot); $i++) { 
                 $response[$i]["price"] = $user->currency->pivot[$i]->price;
-                $response[$i]["quantity"] =;
-                $response[$i]["currency"] =;
-            }
+                $response[$i]["quantity"] = $user->currency->pivot[$i]->quantity;
+                $response[$i]["currency"] = $user->currency->pivot[$i]->currency;
+            }*/
               
         } else {
             $response = "Ese usuario no existe";
+        }
+        // Enviar la respuesta
+        return $response;
+    }
+
+    /**POST
+     * 
+     */
+    public function update_profile(Request $request){
+        $response = "";
+        //Leer el contenido de la petición
+        $data = $request->getContent();
+        //Decodificar el json
+        $data = json_decode($data);
+        $key = MyJWT::getKey();
+        //Decodificar el token
+        $headers = getallheaders();
+        $decoded = JWT::decode($headers['api_token'], $key, array('HS256'));
+
+        // Buscar el usuario 
+        $user = User::where('username', $decoded->username)->get()->first();
+
+        if($data){
+            $user->name = (isset($data->name) ? $data->name : $user->name);
+            $user->surname = (isset($data->surname) ? $data->surname : $user->surname);
+            $user->profile_pic = (isset($data->profile_pic) ? $data->profile_pic : $user->profile_pic);
+
+            try{
+                $user->save();
+                // Se envia la nueva contraseña al usuario
+                $response = "OK";
+            }catch(\Exception $e){
+                $response = $e->getMessage();
+            }
+            
         }
         // Enviar la respuesta
         return $response;
