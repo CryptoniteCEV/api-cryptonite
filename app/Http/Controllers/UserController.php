@@ -38,6 +38,10 @@ class UserController extends Controller
             
             try{
                 $user->save();
+                $score = New Score();
+                $score->experience = 0;
+                $score->user_id = $user->id;
+                $score->save();
                 $response = "Usuario registrado";
             }catch(\Exception $e){
                 $response = $e->getMessage();
@@ -144,7 +148,7 @@ class UserController extends Controller
 
                 try{
                     $user->save();
-                    // Se envia la nueva contraseña al usuario
+                    
                     $response = "OK";
                 }catch(\Exception $e){
                     $response = $e->getMessage();
@@ -243,7 +247,7 @@ class UserController extends Controller
 
             try{
                 $user->save();
-                // Se envia la nueva contraseña al usuario
+               
                 $response = "OK";
             }catch(\Exception $e){
                 $response = $e->getMessage();
@@ -253,5 +257,111 @@ class UserController extends Controller
         // Enviar la respuesta
         return $response;
     }
+
+    /**POST
+     * 
+     */
+    public function follow_user(Request $request, $username){
+        $response = "";
+        //Leer el contenido de la petición
+        $data = $request->getContent();
+        //Decodificar el json
+        $data = json_decode($data);
+        $key = MyJWT::getKey();
+        //Decodificar el token
+        $headers = getallheaders();
+        $decoded = JWT::decode($headers['api_token'], $key, array('HS256'));
+
+        // Buscar el usuario 
+        $user_who_follow = User::where('username', $decoded->username)->get()->first();
+
+        $user_who_is_followed = User::where('username', $data->username)->get()->first();
+
+        if($user_who_is_followed){
+            $following = New Following();
+
+            $following->following_id = $user_who_is_followed->id;
+            $following->follower_id = $user_who_follow->id;
+
+            try{
+                $following->save();
+               
+                $response = "OK";
+            }catch(\Exception $e){
+                $response = $e->getMessage();
+            }
+            
+        }else $response = "Ese usuario no existe";
+        // Enviar la respuesta
+        return $response;
+    }
+
+    /**GET
+     * 
+     */
+    public function followings_list(Request $request){
+        $response = "";
+        //Decodificar el token
+        $key = MyJWT::getKey();
+        $headers = getallheaders();
+        $decoded = JWT::decode($headers['api_token'], $key, array('HS256'));
+
+        // Buscar el usuario 
+        $user = User::where('username', $decoded->username)->get()->first();
+        $followings_list = Following::where('follower_id', $user->id)->get();
+
+        $response = [];
+
+        if($followings_list){
+            for ($i=0; $i < count($followings_list); $i++) { 
+                $user_followed = User::find($followings_list[$i]->following_id);
+                $response = [
+                "username" => $user_followed->username,
+                "profile_pic" => $user_followed->profile_pic
+            ];
+            }
+        } else {
+            $response = "No sigues a ningún usuario";
+        }
+        // Enviar la respuesta
+        return $response;
+    }
+
+    /**POST
+     * 
+     */
+    public function update_exp(Request $request, $newExp){
+        $response = "";
+        //Leer el contenido de la petición
+        $data = $request->getContent();
+        //Decodificar el json
+        $data = json_decode($data);
+        $key = MyJWT::getKey();
+        //Decodificar el token
+        $headers = getallheaders();
+        $decoded = JWT::decode($headers['api_token'], $key, array('HS256'));
+
+        // Buscar el usuario 
+        $user = User::where('username', $decoded->username)->get()->first();
+
+        if($user){
+            $score = Score::where('user_id', $user->id);
+
+            $score->experience = $newExp;
+            
+
+            try{
+                $following->save();
+               
+                $response = "OK";
+            }catch(\Exception $e){
+                $response = $e->getMessage();
+            }
+            
+        }else $response = "Ese usuario no existe";
+        // Enviar la respuesta
+        return $response;
+    }
+
 }
  
