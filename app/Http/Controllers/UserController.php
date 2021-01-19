@@ -292,6 +292,36 @@ class UserController extends Controller
         return $response;
     }
 
+    /**GET
+     * 
+     */
+    public function followings_list(Request $request){
+        $response = "";
+        //Decodificar el token
+        $key = MyJWT::getKey();
+        $headers = getallheaders();
+        $decoded = JWT::decode($headers['api_token'], $key, array('HS256'));
+
+        // Buscar el usuario 
+        $user = User::where('username', $decoded->username)->get()->first();
+        $followings_list = Following::where('follower_id', $user->id)->get();
+
+        $response = [];
+
+        if($followings_list){
+            for ($i=0; $i < count($followings_list); $i++) { 
+                $user_followed = User::find($followings_list[$i]->following_id);
+                $response = [
+                "username" => $user_followed->username,
+                "profile_pic" => $user_followed->profile_pic
+            ];
+            }
+        } else {
+            $response = "No sigues a ningún usuario";
+        }
+        // Enviar la respuesta
+        return $response;
+    }
 
 }
  
