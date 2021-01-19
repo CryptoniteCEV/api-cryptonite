@@ -85,4 +85,77 @@ class UserController extends Controller
         return response($response);
 
     }
+
+    /**POST
+     * 
+     */
+    public function restore_password(Request $request){
+        $response = "";
+        //Leer el contenido de la petición
+        $data = $request->getContent();
+        //Decodificar el json
+        $data = json_decode($data);
+        // Buscar el usuario por su email
+        $user = User::where('email', $data->email)->get()->first();
+
+        if($user){
+            // Generar una nueva contraseña aleatoria
+            $new_password = Str::random(15);
+            // Guardar la contraseña en la bbdd
+            $user->password = Hash::make($new_password);
+
+            try{
+                $user->save();
+                // Se envia la nueva contraseña al usuario
+                $response = "Tu nueva contraseña es: ".$new_password;
+            }catch(\Exception $e){
+                $response = $e->getMessage();
+            }
+        }else $response = "El email introducido no existe";
+        // Enviar la respuesta
+        return $response;
+    }
+
+    /**POST
+     * 
+     */
+    public function change_password(){
+        $response = "";
+        //Leer el contenido de la petición
+        $data = $request->getContent();
+        //Decodificar el json
+        $data = json_decode($data);
+        //Decodificar el token
+        $headers = getallheaders();
+        $decoded = JWT::decode($headers['api_token'], $key, array('HS256'));
+
+        // Buscar el usuario 
+        $user = User::where('username', $decoded->username)->get()->first();
+
+        if($data){
+            // Si la contraseña guardada es correcta
+            if(Hash::check($data->password, $user->password)){
+                // Guardar la nueva contraseña
+                $user->password = Hash::make($data->new_password);
+
+                try{
+                    $user->save();
+                    // Se envia la nueva contraseña al usuario
+                    $response = "OK";
+                }catch(\Exception $e){
+                    $response = $e->getMessage();
+                }
+            }
+        }
+        // Enviar la respuesta
+        return $response;
+    }
+
+    /**GET
+     * 
+     */
+    public function profile_info(){
+
+    }
 }
+ 
