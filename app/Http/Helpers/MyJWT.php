@@ -23,3 +23,4 @@ class MyJWT{
         return JWT::encode(generatePayload($username), self::KEY);
     }
 }
+

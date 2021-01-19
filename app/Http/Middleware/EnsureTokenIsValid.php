@@ -6,6 +6,9 @@ use Closure;
 use Illuminate\Http\Request;
 use App\Models\User;
 use \Firebase\JWT\JWT;
+use App\Http\Helpers\MyJWT;
+
+use Firebase\Auth\Token\Exception\InvalidToken;
 
 class EnsureTokenIsValid
 {
@@ -17,25 +20,25 @@ class EnsureTokenIsValid
      * @return mixed
      */
     public function handle(Request $request, Closure $next)
-    {
-        define("ADMIN","Administrator");
-        
+    {        
         $key = MyJWT::getKey();
 
         $headers = getallheaders();
 
-        $decoded = JWT::decode($headers['api_token'], $key, array('HS256'));
-        
-        if($decoded){
+        $api_token = $headers['api_token'];
 
-            if($decoded->role === ADMIN){
-                return $next($request);
-            }else{
-                abort(403, "¡Usted no está permitido aquí!");
-            }
+        $alg = 'HS256';
+
+        $sign = JWT::sign($api_token, $key, $alg);
+
+        $decoded = JWT::decode($api_token, $key, array($alg));        
+        
+        if(isset($decoded->username) && ($decoded->username === "Sharkteeth89")){
+
+            return $next($request);
 
         }else{
-            abort(403, "¡Token vacío!");
+            abort(403, "No autorizado");
         }
     }
 }
