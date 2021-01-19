@@ -38,6 +38,10 @@ class UserController extends Controller
             
             try{
                 $user->save();
+                $score = New Score();
+                $score->experience = 0;
+                $score->user_id = $user->id;
+                $score->save();
                 $response = "Usuario registrado";
             }catch(\Exception $e){
                 $response = $e->getMessage();
@@ -319,6 +323,42 @@ class UserController extends Controller
         } else {
             $response = "No sigues a ningún usuario";
         }
+        // Enviar la respuesta
+        return $response;
+    }
+
+    /**POST
+     * 
+     */
+    public function update_exp(Request $request, $newExp){
+        $response = "";
+        //Leer el contenido de la petición
+        $data = $request->getContent();
+        //Decodificar el json
+        $data = json_decode($data);
+        $key = MyJWT::getKey();
+        //Decodificar el token
+        $headers = getallheaders();
+        $decoded = JWT::decode($headers['api_token'], $key, array('HS256'));
+
+        // Buscar el usuario 
+        $user = User::where('username', $decoded->username)->get()->first();
+
+        if($user){
+            $score = Score::where('user_id', $user->id);
+
+            $score->experience = $newExp;
+            
+
+            try{
+                $following->save();
+               
+                $response = "OK";
+            }catch(\Exception $e){
+                $response = $e->getMessage();
+            }
+            
+        }else $response = "Ese usuario no existe";
         // Enviar la respuesta
         return $response;
     }

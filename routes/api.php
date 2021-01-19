@@ -18,8 +18,8 @@ Route::prefix('users')->group(function () {
 	Route::get('user/info/{id}',[UserController::class, 'following_info'])->middleware('EnsureTokenIsValid');
 	Route::post('/update/profile',[UserController::class, 'update_profile'])->middleware('EnsureTokenIsValid');
 	Route::post('/follow/{username}',[UserController::class, 'follow_user'])->middleware('EnsureTokenIsValid');
-	Route::get('/followings/list',[UserController::class, 'followingsList'])->middleware('EnsureTokenIsValid');
-	Route::post('/update/exp/{newExp}',[UserController::class, 'updateExp'])->middleware('EnsureTokenIsValid');
+	Route::get('/followings/list',[UserController::class, 'followings_list'])->middleware('EnsureTokenIsValid');
+	Route::post('/update/exp/{newExp}',[UserController::class, 'update_exp'])->middleware('EnsureTokenIsValid');
 	Route::post('/update/lvl/{newLvl}',[UserController::class, 'updateLvl'])->middleware('EnsureTokenIsValid');
 	Route::post('/trade',[UserController::class, 'tradeCoins'])->middleware('EnsureTokenIsValid');
 	Route::get('/followers',[UserController::class, 'getFollowers'])->middleware('EnsureTokenIsValid');
