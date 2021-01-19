@@ -13,4 +13,13 @@ class user extends Model
     {
         return $this->hasOne(Score::class);
     }
+
+    public function trade()
+    {
+        return $this->belongsToMany(currency::class, "trades")->withPivot('price', 'quantity');
+    }
+
+    public function wallet(){
+        return $this->belongsToMany(currency::class, "wallets")->withPivot('quantity');
+    }
 }
