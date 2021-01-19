@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 use App\Models\User;
+use App\Models\Score;
+use App\Models\Currency;
+use App\Models\Trade;
+use App\Models\Wallet;
 
 use App\Http\Helpers\MyJWT;
 use \Firebase\JWT\JWT;
@@ -28,6 +32,7 @@ class UserController extends Controller
 		if($data){
 
             $user = new User();
+            $score = New Score();
 
             $user->username = $data->username;
             $user->email = $data->email;
@@ -38,7 +43,8 @@ class UserController extends Controller
             
             try{
                 $user->save();
-                $score = New Score();
+
+                $score->level = 0;
                 $score->experience = 0;
                 $score->user_id = $user->id;
                 $score->save();
@@ -351,7 +357,7 @@ class UserController extends Controller
             
 
             try{
-                $following->save();
+                $score->save();
                
                 $response = "OK";
             }catch(\Exception $e){
@@ -361,6 +367,74 @@ class UserController extends Controller
         }else $response = "Ese usuario no existe";
         // Enviar la respuesta
         return $response;
+    }
+
+    public function update_lvl($new_level){
+        $response = "";
+        $headers = getallheaders();
+        $user = User::where('api_token', $headers['api_token'])->get()->first();
+
+        if ($user) {
+
+            $score = Score::where('user_id', $user->id)->get()->first();
+            $score->level = $new_level;
+
+            try{
+                $score->save();
+               
+                $response = "OK";
+            }catch(\Exception $e){
+                $response = $e->getMessage();
+            }
+        }else{
+            $response = "No valid user";
+        }
+        return $response;
+    }
+
+    public function trade_coins(Request $request){
+        $response =[];
+        $data = $request->getContent();
+        $data = json_decode($data);        
+
+        if ($data) {
+            $headers = getallheaders();
+            $user = User::where('api_token', $headers['api_token'])->get()->first();
+            $trade = new Trade();
+
+            if ($user){
+                
+                for ($i=0; $i < count($user->currency); $i++) { 
+
+                    //$response [$i] = $user;
+                    if ($user->currency && $user->currency[$i]->id == $data->coin_id && $user->currency[$i]->pivot->quantity >= $data->quantity) {
+
+                        $wallet = Wallet::where('id', $user->currency[$i]->id)->get()->first();
+                        $wallet->quantity -= $data->quantity;                   
+    
+                        $trade->price = $data->price;
+                        $trade->quantity = $data->quantity;
+                        $trade->user_id = $user->id;
+                        $trade->currency_id = $data->coin_id;
+    
+                        try{
+                            $trade->save();
+                            $wallet->save();
+                            $response = "Trade succesful";
+                        }catch(\Exception $e){
+                            $response = $e->getMessage();
+                        }
+                    }else{
+                        $response = "no";
+                    }
+                }
+                               
+            }else{
+                $response = "No valid user";
+            }
+        }
+
+        return response()->json($response);
     }
 
 }

@@ -18,8 +18,6 @@ class WalletController extends Controller
         if ($data) {
             $headers = getallheaders();
 
-            $api_token = $headers['api_token'];
-
             $user = User::where('api_token', $headers['api_token'])->get()->first();
 
             $coin = currency::where('name', $data->coin_name)->get()->first();
@@ -59,11 +57,11 @@ class WalletController extends Controller
 
         $user = User::where('api_token', $headers['api_token'])->get()->first();
 
-        if ($user->wallet) {
-            for ($i=0; $i < count($user->wallet); $i++) { 
+        if ($user->currency) {
+            for ($i=0; $i < count($user->currency); $i++) { 
                 $response [$i] = [
-                    "Coin Name" => $user->wallet[$i]->name,
-                    "Quantity" => $user->wallet[$i]->pivot->quantity,
+                    "Coin Name" => $user->currency[$i]->name,
+                    "Quantity" => $user->currency[$i]->pivot->quantity,
                 ];
             }            
         }else{

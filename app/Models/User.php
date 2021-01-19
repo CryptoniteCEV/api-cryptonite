@@ -19,7 +19,7 @@ class user extends Model
         return $this->belongsToMany(currency::class, "trades")->withPivot('price', 'quantity');
     }
 
-    public function wallet(){
+    public function currency(){
         return $this->belongsToMany(currency::class, "wallets")->withPivot('quantity');
     }
 
