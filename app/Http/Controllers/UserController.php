@@ -144,7 +144,7 @@ class UserController extends Controller
 
                 try{
                     $user->save();
-                    // Se envia la nueva contraseña al usuario
+                    
                     $response = "OK";
                 }catch(\Exception $e){
                     $response = $e->getMessage();
@@ -243,7 +243,7 @@ class UserController extends Controller
 
             try{
                 $user->save();
-                // Se envia la nueva contraseña al usuario
+               
                 $response = "OK";
             }catch(\Exception $e){
                 $response = $e->getMessage();
@@ -253,5 +253,45 @@ class UserController extends Controller
         // Enviar la respuesta
         return $response;
     }
+
+    /**POST
+     * 
+     */
+    public function follow_user(Request $request, $username){
+        $response = "";
+        //Leer el contenido de la petición
+        $data = $request->getContent();
+        //Decodificar el json
+        $data = json_decode($data);
+        $key = MyJWT::getKey();
+        //Decodificar el token
+        $headers = getallheaders();
+        $decoded = JWT::decode($headers['api_token'], $key, array('HS256'));
+
+        // Buscar el usuario 
+        $user_who_follow = User::where('username', $decoded->username)->get()->first();
+
+        $user_who_is_followed = User::where('username', $data->username)->get()->first();
+
+        if($user_who_is_followed){
+            $following = New Following();
+
+            $following->following_id = $user_who_is_followed->id;
+            $following->follower_id = $user_who_follow->id;
+
+            try{
+                $following->save();
+               
+                $response = "OK";
+            }catch(\Exception $e){
+                $response = $e->getMessage();
+            }
+            
+        }else $response = "Ese usuario no existe";
+        // Enviar la respuesta
+        return $response;
+    }
+
+
 }
  
