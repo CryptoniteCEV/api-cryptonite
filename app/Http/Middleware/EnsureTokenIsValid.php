@@ -33,7 +33,7 @@ class EnsureTokenIsValid
 
         $decoded = JWT::decode($api_token, $key, array($alg));        
         
-        if(isset($decoded->username) && ($decoded->username === "Sharkteeth89")){
+        if($decoded){
 
             return $next($request);
 
