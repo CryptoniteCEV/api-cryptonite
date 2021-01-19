@@ -191,16 +191,25 @@ class UserController extends Controller
         // Buscar el usuario 
         $user = User::find($id);
 
-        if($user){
-            $trades = Trade::where('user_id', $id)->get();
+        $response = [];
 
-            $response = [
+        if($user){
+
+           $response [] = [
                 "username" => $user->username,
                 "profile_pic" => $user->profile_pic
-                
-                
-                
             ];
+            //
+            //
+            // HAY QUE REVISAR TODO ESTO, PROBABLEMENTE ES MEJOR PASARLO A TRADE Y HACERLO DESDE AHÍ
+            //
+            //
+            for ($i=0; $i < count($user->currency->pivot); $i++) { 
+                $response[$i]["price"] = $user->currency->pivot[$i]->price;
+                $response[$i]["quantity"] =;
+                $response[$i]["currency"] =;
+            }
+              
         } else {
             $response = "Ese usuario no existe";
         }
