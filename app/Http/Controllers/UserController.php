@@ -399,8 +399,7 @@ class UserController extends Controller
             $user = User::where('api_token', $headers['api_token'])->get()->first();
             $trade = new Trade();
 
-            if ($user){
-                
+            if ($user){                
                 for ($i=0; $i < count($user->currency); $i++) { 
 
                     if ($user->currency && $user->currency[$i]->id == $data->coin_id && $user->currency[$i]->pivot->quantity >= $data->quantity) {
