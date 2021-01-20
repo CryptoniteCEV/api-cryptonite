@@ -20,7 +20,6 @@ class CurrencyController extends Controller
 		if($data){
 
             $currency = new Currency();
-
             $currency->name = $data->name;
 
             try{
