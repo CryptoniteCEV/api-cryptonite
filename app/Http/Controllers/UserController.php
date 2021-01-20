@@ -82,7 +82,6 @@ class UserController extends Controller
 
                 $response = $jwt;
                 $user->api_token = $jwt;
-
                 try{
                     $user->save();
                 }catch(\Exception $e){
