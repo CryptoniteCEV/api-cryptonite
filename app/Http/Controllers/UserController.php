@@ -350,8 +350,7 @@ class UserController extends Controller
         if($user){
             $score = Score::where('user_id', $user->id);
 
-            $score->experience = $newExp;
-            
+            $score->experience = $newExp;            
 
             try{
                 $score->save();
