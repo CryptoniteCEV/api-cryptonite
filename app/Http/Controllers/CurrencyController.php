@@ -28,7 +28,6 @@ class CurrencyController extends Controller
             }catch(\Exception $e){
                 $response = $e->getMessage();
             }
-
 		}else{
 			$response = "No has introducido una moneda válida";
 		}
