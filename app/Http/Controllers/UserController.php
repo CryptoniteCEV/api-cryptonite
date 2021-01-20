@@ -353,8 +353,7 @@ class UserController extends Controller
             $score->experience = $newExp;            
 
             try{
-                $score->save();
-               
+                $score->save();               
                 $response = "OK";
             }catch(\Exception $e){
                 $response = $e->getMessage();
