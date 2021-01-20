@@ -433,9 +433,7 @@ class UserController extends Controller
                 $response = "No valid user";
             }
         }
-
         return response()->json($response);
     }
-
 }
  
