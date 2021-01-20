@@ -406,7 +406,6 @@ class UserController extends Controller
                 
                 for ($i=0; $i < count($user->currency); $i++) { 
 
-                    //$response [$i] = $user;
                     if ($user->currency && $user->currency[$i]->id == $data->coin_id && $user->currency[$i]->pivot->quantity >= $data->quantity) {
 
                         $wallet = Wallet::where('id', $user->currency[$i]->id)->get()->first();
