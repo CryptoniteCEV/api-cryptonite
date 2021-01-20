@@ -88,11 +88,9 @@ class UserController extends Controller
                 }catch(\Exception $e){
                     $response = $e->getMessage();
                 }
-
             }else{
                 $response = "Usuario o contraseña no coinciden";
             }
-
         }
 
         return response($response);
