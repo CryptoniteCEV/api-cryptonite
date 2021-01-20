@@ -52,7 +52,6 @@ class CurrencyController extends Controller
                 "Name" => $currency->name
                 //Próximamente necesitaremos su valor recogido de una api amiga
             ];
-
         }
 
         return response()->json($request);
