@@ -11,7 +11,14 @@ use \Firebase\JWT\JWT;
 
 class TradeController extends Controller
 {
-
+    /**GET
+     * Ver la lista de trades de un usuario
+     * 
+     * Muestra la lista de trades del usuario. Lo busca por el token y devuelve el nombre de la moneda
+     * comprada o vendida, el precio al que se realizó la transacción y la cantidad
+     *
+     * @return $response La lista de los trades realizados por el usuario
+     */
     public function trade_history()
     {
         $headers = getallheaders();

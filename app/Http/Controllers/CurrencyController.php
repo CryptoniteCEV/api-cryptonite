@@ -8,8 +8,12 @@ use Illuminate\Http\Request;
 
 class CurrencyController extends Controller
 {
-    /**
+    /**POST
+     * Registra una nueva cryptomoneda. /currencies/register
+     *
      * Recibe nombre de la moneda a través de body para introducirla en la database
+     *
+     * @return $response Confirmación
      */
     public function createCurrency(Request $request){
 
@@ -36,8 +40,13 @@ class CurrencyController extends Controller
 
     }
 
-    /**
-     * Devuelve lista de monedas en forma de Json
+    /**GET
+     * Devuelve lista de monedas en forma de Json. /currencies/list
+     *
+     * Recoge todos los datos de la tabla currencies para mostrar todas las cryptomonedas
+     * disponibles en la abse de datos.
+     *
+     * return $response Lista de monedas
      */
     public function getCoins(){
 
