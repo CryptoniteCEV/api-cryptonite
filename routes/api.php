@@ -44,7 +44,7 @@ Route::prefix('wallets')->group(function () {
 
 Route::prefix('currencies')->group(function () {
 
-    Route::get('/register',[WalletController::class, 'create_currency'])->middleware('EnsureTokenIsValid'); // Done
+    Route::post('/register',[WalletController::class, 'create_currency'])->middleware('EnsureTokenIsValid'); // Done
 	Route::get('/list',[WalletController::class, 'get_coins'])->middleware('EnsureTokenIsValid'); // Done
 
 });

@@ -10,6 +10,15 @@ use App\Models\wallet;
 
 class WalletController extends Controller
 {
+    /**POST
+     * Depositar una cantidad de "x" moneda en la cartera del usuario /wallets/deposit
+     *
+     * Busca al usuario por su api_token, recibe en la petición la currency que se va a 
+     * depositar y la cantidad, y se añade a la tabla wallet añadiendo ademas el user_id
+     *
+     * @param $request La petición con los datos del deposito
+     * @return $response Confirmación del depósito
+     */
     public function deposit(Request $request){
         $response = "";
 		$data = $request->getContent();
@@ -49,6 +58,14 @@ class WalletController extends Controller
         return response($response);
     }
 
+    /**GET
+     * Recibe la información de la cartera del usuario. /wallets/info
+     *
+     * Busca al usuario por su api_token, si tiene alguna cryptomoneda, busca los
+     * datos en la tabla wallet y devuelve el nombre de la moneda y la cantidad de la misma
+     *
+     * @return $response en caso de que tenga alguna cryptomoneda, devuelve los datos de la cartera del usuario
+     */
     public function wallet_info(){
 
         $headers = getallheaders();

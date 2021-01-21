@@ -450,6 +450,8 @@ class UserController extends Controller
     }
 
     /**POST
+     * Vender cantidad de cryptos que pesea el usuario en su wallet
+     * Falta hacer que se pueda comprar
      * 
      */
     public function trade_coins(Request $request){
