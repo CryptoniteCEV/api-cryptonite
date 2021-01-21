@@ -1,4 +1,4 @@
-<p align="center"><a href="https://github.com/CryptoniteCEV/api-cryptonite" target="_blank"><img src="https://github.com/CryptoniteCEV/api-cryptonite/blob/main/logoV2transparente.png" width="400"></a></p>
+<p align="center"><a href="https://github.com/CryptoniteCEV/api-cryptonite" target="_blank"><img src="https://github.com/CryptoniteCEV/api-cryptonite/blob/main/logoV2transparente.png" width="600"></a></p>
 
 <p align="center">
 <a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
