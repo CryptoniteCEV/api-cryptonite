@@ -303,7 +303,7 @@ class UserController extends Controller
      * 
      */
     public function followings_list(Request $request){
-        $response = "";
+        $response = [];
         //Decodificar el token
         $key = MyJWT::getKey();
         $headers = getallheaders();
@@ -312,8 +312,7 @@ class UserController extends Controller
         // Buscar el usuario 
         $user = User::where('username', $decoded->username)->get()->first();
         $followings_list = Following::where('follower_id', $user->id)->get();
-
-        $response = [];
+        
 
         if($followings_list){
             for ($i=0; $i < count($followings_list); $i++) { 
@@ -427,6 +426,30 @@ class UserController extends Controller
             }
         }
         return response()->json($response);
+    }
+
+    public function get_followers(Request $request) {
+        $response =[];
+
+        $key = MyJWT::getKey();
+        $headers = getallheaders();
+        $decoded = JWT::decode($headers['api_token'], $key, array('HS256'));
+
+        $user = User::where('username', $decoded->username)->get()->first();
+        $followers_list = Following::where('following_id', $user->id)->get();
+
+        if($followers_list){
+            for ($i=0; $i < count($followers_list); $i++) { 
+                $user_follower = User::find($followers_list[$i]->follower_id);
+                $response = [
+                "username" => $user_follower->username,
+                "profile_pic" => $user_follower->profile_pic
+            ];
+            }
+        } else {
+            $response = "No te sigue ningún usuario";
+        }
+        return $response;
     }
 }
  
