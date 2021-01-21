@@ -20,8 +20,14 @@ use \Firebase\JWT\JWT;
 
 class UserController extends Controller
 {
-    /**
+    /**POST
+     * Registro de usuarios en la app. /users/register 
+     *
+     * Llega en la petición el username, email y contraseña, nombre y apellidos y ¿fecha de nacimiento?
+     * Añade el nuevo usuario en la base de daos si la información es correcta.
      * 
+     * @param $request Petición con los datos del usuario
+     * @return $response respuesta de la api OK/NOOK
      */
     public function register(Request $request){
 
@@ -60,8 +66,14 @@ class UserController extends Controller
         return response($response);
 
     }
-    /**
-     * 
+    /** POST
+     * Login de usuarios en la app. /users/login
+     *
+     * Llega en la petición el username y contraseña del usuario, si son correctos, 
+     * obtiene acceso a la app y se genera su token.
+     *
+     * @param $request Petición con los datos de login del usuario
+     * @return $response Respuesta de la api con el token del usuario 
      */
     public function login(Request $request){
 
@@ -97,7 +109,13 @@ class UserController extends Controller
     }
 
     /**POST
-     * 
+     * Restaurar contraseña del usuario que no puede hacer login. /users/restore/password
+     *
+     * Llega en la peticion el email del usuario que ha olvidado la contraseña. Se genera una nueva contraseña 
+     * aleatoria y se le envia a su email
+     *
+     * @param $request Petición con el email del usuario
+     * @return $response Respuesta de la api con la nueva contraseña del usuario
      */
     public function restore_password(Request $request){
         $response = "";
@@ -127,7 +145,13 @@ class UserController extends Controller
     }
 
     /**POST
+     * Cambiar la contraseña del usuario desde los ajustes de perfil de la app. /users/update/password
      * 
+     * Llega en la petición la antigua contraseña del usuario y la nueva, si la contraseña antigua es correcta,
+     * se cambia por la nueva contraseña.
+     *
+     * @param $request Petición con la antigua contraseña del usuario y la nueva
+     * @return $response Respuesta de la api OK/Contraseña incorrecta
      */
     public function change_password(Request $request){
         $response = "";
@@ -156,14 +180,20 @@ class UserController extends Controller
                 }catch(\Exception $e){
                     $response = $e->getMessage();
                 }
-            }
+            }else $response = "Contraseña incorrecta";
         }
         // Enviar la respuesta
         return $response;
     }
 
     /**GET
+     * Ver la informacion del perfil. /users/profile/info
      * 
+     * Se obtiene el usuario que hace la petición por su token y se envian sus 
+     * datos de usuario.
+     *
+     * @param $request 
+     * @return $response Respuesta de la api con la información del usuario
      */
     public function profile_info(Request $request){
         $response = "";
@@ -227,7 +257,13 @@ class UserController extends Controller
     }
 
     /**POST
-     * 
+     * Cambiar los datos del usuario. /users/update/profile
+     *
+     * Llega en la petición la información que el usuario quiere modificar y se
+     * actualiza en la base de datos.
+     *
+     * @param $request Petición con los datos a modificar del usuario
+     * @return $response Confirmación de los cambios
      */
     public function update_profile(Request $request){
         $response = "";
@@ -262,14 +298,18 @@ class UserController extends Controller
     }
 
     /**POST
+     * Seguir a un usuario. /users/follow/{username}
      * 
+     * Llega por url el nombre de usuario al que se va a seguir y se decodifica el token para obtener
+     * el id del usuario que va a seguir. Se crea la fila en la tambla de followings.
+     * 
+     * @param $request
+     * @param $username Nombre del usuario al que se va a seguir
+     * @return $response Confirmación de seguimiento
      */
     public function follow_user(Request $request, $username){
         $response = "";
-        //Leer el contenido de la petición
-        $data = $request->getContent();
-        //Decodificar el json
-        $data = json_decode($data);
+        
         $key = MyJWT::getKey();
         //Decodificar el token
         $headers = getallheaders();
@@ -278,7 +318,7 @@ class UserController extends Controller
         // Buscar el usuario 
         $user_who_follow = User::where('username', $decoded->username)->get()->first();
 
-        $user_who_is_followed = User::where('username', $data->username)->get()->first();
+        $user_who_is_followed = User::where('username', $username)->get()->first();
 
         if($user_who_is_followed){
             $following = New Following();
@@ -300,7 +340,13 @@ class UserController extends Controller
     }
 
     /**GET
-     * 
+     * Ver la lista de usarios a los que sigues. /users/followings/list
+     *
+     * Se obtiene el usuario que realiza la peticion decodificando su token y se comprueban los
+     * usuarios a los que sigue en la fabla followings con su id de usuario.
+     *
+     * @param $request
+     * @return $response Lista de los usuarios a los que sigue o No sigues a nadie
      */
     public function followings_list(Request $request){
         $response = [];
@@ -330,7 +376,14 @@ class UserController extends Controller
     }
 
     /**POST
-     * 
+     * Actualizar la experiencia del usuario. /users/update/exp/{newExp}
+     *
+     * Obtiene el usuario por su token y actualiza su experiencia (xp) que llega por url
+     * en la tabla de scores.
+     *
+     * @param $request
+     * @param $newExp La cantidad de experiencia que tiene el usuario para actualizar en la tabla scores
+     * @return $response Mensaje de confirmación
      */
     public function update_exp(Request $request, $newExp){
         $response = "";
@@ -363,7 +416,17 @@ class UserController extends Controller
         return $response;
     }
 
-    public function update_lvl($new_level){
+    /**POST
+     * Actualizar el nivel del usuario. /users/update/lvl/{newLvl}
+     * 
+     * Obtiene el usuario por su token y actualiza su nivel (lvl) que llega por url
+     * en la tabla de scores.
+     * 
+     * @param $request
+     * @param $new_level Nivel al que se va a actualzar en la tabla scores
+     * @return $response Mensaje de confirmación
+     */
+    public function update_lvl(Request $request, $new_level){
         $response = "";
         $headers = getallheaders();
         $user = User::where('api_token', $headers['api_token'])->get()->first();
@@ -386,6 +449,9 @@ class UserController extends Controller
         return $response;
     }
 
+    /**POST
+     * 
+     */
     public function trade_coins(Request $request){
         $response =[];
         $data = $request->getContent();
@@ -428,6 +494,15 @@ class UserController extends Controller
         return response()->json($response);
     }
 
+    /**GET
+     * Ver la lista de tus seguidores /users/followers
+     *
+     * Se obtiene el usuario que realiza la peticion decodificando su token y se comprueban los
+     * usuarios que le siguen en la fabla followings con su id de usuario en following_id.
+     *
+     * @param $request
+     * @return $response Lista con los seguidores/ No tienes seguidores 
+     */
     public function get_followers(Request $request) {
         $response =[];
 
