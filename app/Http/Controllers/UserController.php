@@ -528,5 +528,24 @@ class UserController extends Controller
         }
         return $response;
     }
+    public function get_users() {
+        $response =[];
+        $users = User::all();
+
+        if($users){
+            foreach ($users as $user) {
+                $response = [
+                    "username" => $user->username,
+                    "profile_pic" => $user->profile_pic,
+                    "name" => $user->name,
+                    "surname" => $user->surname,
+                    "email" => $user->email
+                ];
+            }
+        } else {
+            $response = "No hay users";
+        }
+        return response($users);
+    }
 }
  

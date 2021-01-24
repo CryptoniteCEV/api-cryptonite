@@ -23,6 +23,7 @@ Route::prefix('users')->group(function () {
 	Route::post('/update/lvl/{newLvl}',[UserController::class, 'update_lvl'])->middleware('EnsureTokenIsValid');// Done	
 	Route::post('/trade',[UserController::class, 'trade_coins'])->middleware('EnsureTokenIsValid'); // Done
 	Route::get('/followers',[UserController::class, 'get_followers'])->middleware('EnsureTokenIsValid'); // Done
+	Route::get('/all',[UserController::class, 'get_users']);
 
 });
 
