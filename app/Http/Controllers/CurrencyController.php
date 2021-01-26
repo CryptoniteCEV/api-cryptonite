@@ -36,7 +36,7 @@ class CurrencyController extends Controller
 			$response = "No has introducido una moneda válida";
 		}
 
-        return response($response);
+        return response()->json($response);
 
     }
 

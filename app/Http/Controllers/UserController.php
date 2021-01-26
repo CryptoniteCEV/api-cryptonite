@@ -63,7 +63,7 @@ class UserController extends Controller
 			$response = "No has introducido un usuario válido";
 		}
 
-        return response($response);
+        return response()->json($response);
 
     }
     /** POST
@@ -104,7 +104,7 @@ class UserController extends Controller
             }
         }
 
-        return response($response);
+        return response()->json($response);
 
     }
 
@@ -139,9 +139,11 @@ class UserController extends Controller
             }catch(\Exception $e){
                 $response = $e->getMessage();
             }
-        }else $response = "El email introducido no existe";
+        }else {
+            $response = "El email introducido no existe";
+        }
         // Enviar la respuesta
-        return $response;
+        return response()->json($response);
     }
 
     /**POST
@@ -183,7 +185,7 @@ class UserController extends Controller
             }else $response = "Contraseña incorrecta";
         }
         // Enviar la respuesta
-        return $response;
+        return response()->json($response);
     }
 
     /**GET
@@ -218,7 +220,7 @@ class UserController extends Controller
             $response = "Ese usuario no existe";
         }
         // Enviar la respuesta
-        return $response;
+        return response()->json($response);
     }
 
     /**GET
@@ -253,7 +255,7 @@ class UserController extends Controller
             $response = "Ese usuario no existe";
         }
         // Enviar la respuesta
-        return $response;
+        return response()->json($response);
     }
 
     /**POST
@@ -294,7 +296,7 @@ class UserController extends Controller
             
         }
         // Enviar la respuesta
-        return $response;
+        return response()->json($response);
     }
 
     /**POST
@@ -336,7 +338,7 @@ class UserController extends Controller
             
         }else $response = "Ese usuario no existe";
         // Enviar la respuesta
-        return $response;
+        return response()->json($response);
     }
 
     /**GET
@@ -372,7 +374,7 @@ class UserController extends Controller
             $response = "No sigues a ningún usuario";
         }
         // Enviar la respuesta
-        return $response;
+        return response()->json($response);
     }
 
     /**POST
@@ -413,7 +415,7 @@ class UserController extends Controller
             
         }else $response = "Ese usuario no existe";
         // Enviar la respuesta
-        return $response;
+        return response()->json($response);
     }
 
     /**POST
@@ -446,7 +448,7 @@ class UserController extends Controller
         }else{
             $response = "No valid user";
         }
-        return $response;
+        return response()->json($response);
     }
 
     /**POST
@@ -526,8 +528,12 @@ class UserController extends Controller
         } else {
             $response = "No te sigue ningún usuario";
         }
-        return $response;
+        return response()->json($response);
     }
+
+    /**
+     * Devuelve todos los usuarios
+     */
     public function get_users() {
         $response =[];
         $users = User::all();
@@ -545,7 +551,7 @@ class UserController extends Controller
         } else {
             $response = "No hay users";
         }
-        return response($users);
+        return response()->json($users);
     }
 }
  
