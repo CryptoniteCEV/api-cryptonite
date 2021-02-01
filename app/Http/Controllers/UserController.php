@@ -533,19 +533,19 @@ class UserController extends Controller
         $users = User::all();
 
         if($users){
-            foreach ($users as $user) {
-                $response = [
-                    "username" => $user->username,
-                    "profile_pic" => $user->profile_pic,
-                    "name" => $user->name,
-                    "surname" => $user->surname,
-                    "email" => $user->email
+            for ($i=0; $i <count($users) ; $i++) { 
+                $response[$i] = [
+                    "username" => $users[$i]->username,
+                    "profile_pic" => $users[$i]->profile_pic,
+                    "name" => $users[$i]->name,
+                    "surname" => $users[$i]->surname,
+                    "email" => $users[$i]->email
                 ];
-            }
+            } 
         } else {
             $response = "No hay users";
         }
-        return response($users);
+        return response()->json($response);
     }
 }
  
