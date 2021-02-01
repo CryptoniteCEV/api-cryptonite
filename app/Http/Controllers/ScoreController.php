@@ -32,7 +32,7 @@ class ScoreController extends Controller
         }else{
             $response = "No scores found";
         }
-        return response($response);
+        return response()->json($response);
     }
     
 }

@@ -21,7 +21,8 @@ class CreateUsersTable extends Migration
             $table->string('surname', '50');
             $table->string('password');
             $table->string('profile_pic')->nullable();
-            $table->string('api_token')->nullable();
+            $table->string('date_of_birth');
+            
             $table->timestamps();
         });
     }

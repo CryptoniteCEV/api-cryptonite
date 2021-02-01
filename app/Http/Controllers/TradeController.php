@@ -33,14 +33,14 @@ class TradeController extends Controller
                     "Coin Name" => $user->trade[$i]->name,
                     "Price" => $user->trade[$i]->pivot->price,
                     "Quantity" => $user->trade[$i]->pivot->quantity,
-                    //"Is sell" => $user->trade[$i]->pivot->is_sale
+                    "Is sell" => $user->trade[$i]->pivot->is_sale
                 ];
             }
             
         }else{
             $response = "no user";
         }
-        return response($response);
+        return response()->json($response);
     }
     
 }
