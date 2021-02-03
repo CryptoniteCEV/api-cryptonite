@@ -31,7 +31,7 @@ class UserController extends Controller
      */
     public function register(Request $request){
 
-        $response = "";
+        $response = [];
 		$data = $request->getContent();
         $data = json_decode($data);
         
@@ -77,7 +77,7 @@ class UserController extends Controller
      */
     public function login(Request $request){
 
-        $response = "";
+        $response = [];
 		$data = $request->getContent();
         $data = json_decode($data);
         
@@ -553,5 +553,37 @@ class UserController extends Controller
         }
         return response()->json($response);
     }
+    /**
+     * Devuelve todos los usuarios
+     */
+    public function delete_user() {
+        $response = [];
+
+        $key = MyJWT::getKey();
+
+        //Decodificar el token
+        $headers = getallheaders();
+        $decoded = JWT::decode($headers['api_token'], $key, array('HS256'));
+
+        // Buscar el usuario 
+        $user = User::where('username', $decoded->username)->get()->first();
+    
+        if($user){
+
+            try{
+                $user->delete();
+                $response = "Deleted";
+            }catch(\Exception $e){
+                $response = $e->getMessage();
+            }
+                        
+        }else{
+            $response = "No user with the same username";
+        }
+
+        return response()->json($response);
+    
+    }
+
 }
  
