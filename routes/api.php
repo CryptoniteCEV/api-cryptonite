@@ -24,7 +24,7 @@ Route::prefix('users')->group(function () {
 	Route::post('/trade',[UserController::class, 'trade_coins'])->middleware('EnsureTokenIsValid'); // Done
 	Route::get('/followers',[UserController::class, 'get_followers'])->middleware('EnsureTokenIsValid'); // Done
 	Route::get('/all',[UserController::class, 'get_users']);
-	Route::post('/delete',[UserController::class, 'delete_user'])->middleware('EnsureTokenIsValid');
+	Route::get('/delete',[UserController::class, 'delete_user'])->middleware('EnsureTokenIsValid');
 
 });
 

@@ -83,24 +83,29 @@ class UserController extends Controller
         
         $user = User::where('username', $data->username)->get()->first();
 
-        $payload = MyJWT::generatePayload($user);
-        $key = MyJWT::getKey();
+        if($user){
 
-        $jwt = JWT::encode($payload, $key);
-        
-		if($data){
+            $payload = MyJWT::generatePayload($user);
+            $key = MyJWT::getKey();
 
-            if (Hash::check($data->password, $user->password)) { 
+            $jwt = JWT::encode($payload, $key);
+            
+            if($data){
 
-                $response = $jwt;
-                try{
-                    $user->save();
-                }catch(\Exception $e){
-                    $response = $e->getMessage();
+                if (Hash::check($data->password, $user->password)) { 
+                    
+                    try{
+                        $user->save();
+                        $response = "OK " . $jwt;
+                    }catch(\Exception $e){
+                        $response = $e->getMessage();
+                    }
+                }else{
+                    $response = "Usuario o contraseña no coinciden";
                 }
-            }else{
-                $response = "Usuario o contraseña no coinciden";
             }
+        }else{
+            $response = "500";
         }
 
         return response()->json($response);
@@ -170,18 +175,17 @@ class UserController extends Controller
 
         if($data){
             // Si la contraseña guardada es correcta
-            if(Hash::check($data->password, $user->password)){
+            //if(Hash::check($data->password, $user->password)){
                 // Guardar la nueva contraseña
                 $user->password = Hash::make($data->new_password);
 
                 try{
                     $user->save();
-                    
                     $response = "OK";
                 }catch(\Exception $e){
                     $response = $e->getMessage();
                 }
-            }else $response = "Contraseña incorrecta";
+            //}else $response = "Contraseña incorrecta";
         }
         // Enviar la respuesta
         return response()->json($response);
@@ -563,7 +567,7 @@ class UserController extends Controller
 
         //Decodificar el token
         $headers = getallheaders();
-        print_r(getallheaders());
+        //print_r(getallheaders());
         $decoded = JWT::decode($headers['api_token'], $key, array('HS256'));
         $response = $headers['api_token'];
         // Buscar el usuario 
