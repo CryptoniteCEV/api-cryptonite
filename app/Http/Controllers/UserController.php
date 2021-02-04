@@ -45,7 +45,7 @@ class UserController extends Controller
             $user->password = Hash::make($data->password);
             $user->name = $data->name;
             $user->surname = $data->surname;
-            $user->profile_pic = isset($data->profile_pic) ? $data->profile_pic : $user->profile_pic;
+            $user->profile_pic = $data->profile_pic;
             
             try{
                 $user->save();
@@ -93,7 +93,6 @@ class UserController extends Controller
             if (Hash::check($data->password, $user->password)) { 
 
                 $response = $jwt;
-                $user->api_token = $jwt;
                 try{
                     $user->save();
                 }catch(\Exception $e){
@@ -553,6 +552,7 @@ class UserController extends Controller
         }
         return response()->json($response);
     }
+
     /**
      * Devuelve todos los usuarios
      */
@@ -563,8 +563,9 @@ class UserController extends Controller
 
         //Decodificar el token
         $headers = getallheaders();
+        print_r(getallheaders());
         $decoded = JWT::decode($headers['api_token'], $key, array('HS256'));
-
+        $response = $headers['api_token'];
         // Buscar el usuario 
         $user = User::where('username', $decoded->username)->get()->first();
     
