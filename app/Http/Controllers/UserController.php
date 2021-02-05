@@ -105,7 +105,7 @@ class UserController extends Controller
                 }
             }
         }else{
-            $response = "500";
+            $response = "No User";
         }
 
         return response()->json($response);
@@ -172,7 +172,7 @@ class UserController extends Controller
 
         // Buscar el usuario 
         $user = User::where('username', $decoded->username)->get()->first();
-
+        
         if($data){
             // Si la contraseña guardada es correcta
             //if(Hash::check($data->password, $user->password)){
@@ -186,6 +186,9 @@ class UserController extends Controller
                     $response = $e->getMessage();
                 }
             //}else $response = "Contraseña incorrecta";
+        }else{
+
+            $response = $data;
         }
         // Enviar la respuesta
         return response()->json($response);
