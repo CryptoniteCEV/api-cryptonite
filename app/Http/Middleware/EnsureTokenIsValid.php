@@ -21,24 +21,23 @@ class EnsureTokenIsValid
      */
     public function handle(Request $request, Closure $next)
     {        
-        $key = MyJWT::getKey();
-
         $headers = getallheaders();
-
-        $api_token = $headers['api_token'];
-
-        $alg = 'HS256';
-
-        $sign = JWT::sign($api_token, $key, $alg);
-
-        $decoded = JWT::decode($api_token, $key, array($alg));        
+        if(array_key_exists('Authorization', $headers)){
         
-        if($decoded){
+            $separating_bearer = explode(" ", $headers['Authorization']);
+            $jwt = $separating_bearer[1];
+            
+            $decoded = JWT::decode($jwt, env('PRIVATE_KEY'));        
+        
+            if($decoded){
 
-            return $next($request);
+                return $next($request);
 
+            }else{
+                abort(403, "Forbidden");
+            }
         }else{
-            abort(403, "No autorizado");
+            abort(403, "Token not passed");
         }
     }
 }

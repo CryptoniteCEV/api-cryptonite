@@ -81,14 +81,17 @@ class UserController extends Controller
 		$data = $request->getContent();
         $data = json_decode($data);
         
+        //$decoded = JWT::decode($data, env('PRIVATE_KEY'));
+
         $user = User::where('username', $data->username)->get()->first();
 
         if($user){
 
-            $payload = MyJWT::generatePayload($user);
-            $key = MyJWT::getKey();
+            $payload = array(            
+                'username' => $user->username
+            );
 
-            $jwt = JWT::encode($payload, $key);
+            $jwt = JWT::encode($payload, env('PRIVATE_KEY'));
             
             if($data){
 
@@ -96,7 +99,7 @@ class UserController extends Controller
                     
                     try{
                         $user->save();
-                        $response = "OK " . $jwt;
+                        $response = $jwt;
                     }catch(\Exception $e){
                         $response = $e->getMessage();
                     }
@@ -165,30 +168,35 @@ class UserController extends Controller
         $data = $request->getContent();
         //Decodificar el json
         $data = json_decode($data);
-        $key = MyJWT::getKey();
         //Decodificar el token
         $headers = getallheaders();
-        $decoded = JWT::decode($headers['api_token'], $key, array('HS256'));
+        if(array_key_exists('Authorization', $headers)){
+            $separating_bearer = explode(" ", $headers['Authorization']);
+            $jwt = $separating_bearer[1];
+                
+            $decoded = JWT::decode($jwt, env('PRIVATE_KEY'));    
+            
+            // Buscar el usuario 
+            $user = User::where('username', $decoded->username)->get()->first();
+            
+            if($data){
+                // Si la contraseña guardada es correcta
+                //if(Hash::check($data->password, $user->password)){
+                    // Guardar la nueva contraseña
+                    $user->password = Hash::make($data->new_password);
 
-        // Buscar el usuario 
-        $user = User::where('username', $decoded->username)->get()->first();
-        
-        if($data){
-            // Si la contraseña guardada es correcta
-            //if(Hash::check($data->password, $user->password)){
-                // Guardar la nueva contraseña
-                $user->password = Hash::make($data->new_password);
+                    try{
+                        $user->save();
+                        $response = "OK";
+                    }catch(\Exception $e){
+                        $response = $e->getMessage();
+                    }
+                //}else $response = "Contraseña incorrecta";
+            
+            }else{
 
-                try{
-                    $user->save();
-                    $response = "OK";
-                }catch(\Exception $e){
-                    $response = $e->getMessage();
-                }
-            //}else $response = "Contraseña incorrecta";
-        }else{
-
-            $response = $data;
+                $response = $data;
+            }
         }
         // Enviar la respuesta
         return response()->json($response);
@@ -206,9 +214,8 @@ class UserController extends Controller
     public function profile_info(Request $request){
         $response = "";
         //Decodificar el token
-        $key = MyJWT::getKey();
         $headers = getallheaders();
-        $decoded = JWT::decode($headers['api_token'], $key, array('HS256'));
+        $decoded = JWT::decode($headers['api_token'], env('PRIVATE_KEY'), array('HS256'));
 
         // Buscar el usuario 
         $user = User::where('username', $decoded->username)->get()->first();
@@ -279,10 +286,9 @@ class UserController extends Controller
         $data = $request->getContent();
         //Decodificar el json
         $data = json_decode($data);
-        $key = MyJWT::getKey();
         //Decodificar el token
         $headers = getallheaders();
-        $decoded = JWT::decode($headers['api_token'], $key, array('HS256'));
+        $decoded = JWT::decode($headers['api_token'], env('PRIVATE_KEY'), array('HS256'));
 
         // Buscar el usuario 
         $user = User::where('username', $decoded->username)->get()->first();
@@ -318,10 +324,9 @@ class UserController extends Controller
     public function follow_user(Request $request, $username){
         $response = "";
         
-        $key = MyJWT::getKey();
         //Decodificar el token
         $headers = getallheaders();
-        $decoded = JWT::decode($headers['api_token'], $key, array('HS256'));
+        $decoded = JWT::decode($headers['api_token'], env('PRIVATE_KEY'), array('HS256'));
 
         // Buscar el usuario 
         $user_who_follow = User::where('username', $decoded->username)->get()->first();
@@ -359,9 +364,8 @@ class UserController extends Controller
     public function followings_list(Request $request){
         $response = [];
         //Decodificar el token
-        $key = MyJWT::getKey();
         $headers = getallheaders();
-        $decoded = JWT::decode($headers['api_token'], $key, array('HS256'));
+        $decoded = JWT::decode($headers['api_token'], env('PRIVATE_KEY'), array('HS256'));
 
         // Buscar el usuario 
         $user = User::where('username', $decoded->username)->get()->first();
@@ -399,10 +403,9 @@ class UserController extends Controller
         $data = $request->getContent();
         //Decodificar el json
         $data = json_decode($data);
-        $key = MyJWT::getKey();
         //Decodificar el token
         $headers = getallheaders();
-        $decoded = JWT::decode($headers['api_token'], $key, array('HS256'));
+        $decoded = JWT::decode($headers['api_token'], env('PRIVATE_KEY'), array('HS256'));
 
         // Buscar el usuario 
         $user = User::where('username', $decoded->username)->get()->first();
@@ -515,10 +518,8 @@ class UserController extends Controller
      */
     public function get_followers(Request $request) {
         $response =[];
-
-        $key = MyJWT::getKey();
         $headers = getallheaders();
-        $decoded = JWT::decode($headers['api_token'], $key, array('HS256'));
+        $decoded = JWT::decode($headers['api_token'], env('PRIVATE_KEY'), array('HS256'));
 
         $user = User::where('username', $decoded->username)->get()->first();
         $followers_list = Following::where('following_id', $user->id)->get();
@@ -566,12 +567,10 @@ class UserController extends Controller
     public function delete_user() {
         $response = [];
 
-        $key = MyJWT::getKey();
-
         //Decodificar el token
         $headers = getallheaders();
         //print_r(getallheaders());
-        $decoded = JWT::decode($headers['api_token'], $key, array('HS256'));
+        $decoded = JWT::decode($headers['api_token'], env('PRIVATE_KEY'), array('HS256'));
         $response = $headers['api_token'];
         // Buscar el usuario 
         $user = User::where('username', $decoded->username)->get()->first();
