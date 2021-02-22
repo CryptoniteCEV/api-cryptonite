@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -13,13 +11,21 @@ use App\Models\Currency;
 use App\Models\Trade;
 use App\Models\Wallet;
 
-use App\Http\Helpers\MyJWT;
 use \Firebase\JWT\JWT;
 
+use Illuminate\Http\Request;
+use App\Http\Controllers\ApiController;
+use Illuminate\Support\Facades\Validator;
 
-
-class UserController extends Controller
+class UserController extends ApiController
 {
+
+    public function index()
+    {
+        $user = User::all();
+        return $this->successResponse($user);
+    }
+
     /**POST
      * Registro de usuarios en la app. /users/register 
      *
@@ -31,41 +37,41 @@ class UserController extends Controller
      */
     public function register(Request $request){
 
-        $response = [];
-		$data = $request->getContent();
-        $data = json_decode($data);
-        
-		if($data){
+        $validator = $this->validateUser();
 
-            $user = new User();
-            $score = New Score();
+        if($validator->fails()){
+            return $this->errorResponse($validator->messages(), 422);
+        }
 
-            $user->username = $data->username;
-            $user->email = $data->email;
-            $user->password = Hash::make($data->password);
-            $user->name = $data->name;
-            $user->surname = $data->surname;
-            $user->profile_pic = $data->profile_pic;
-            
-            try{
-                $user->save();
+        $user = User::create([
+            'name' => $request->get('name'),
+            'password' => Hash::make($request->get('password')),
+            'email' => $request->get('email'),
+            'username' => $request->get('username'),
+            'surname' => $request->get('surname'),
+            'profile_pic' => $request->get('profile_pic'),
+            'date_of_birth' => $request->get('date_of_birth')
+        ]);
 
-                $score->level = 0;
-                $score->experience = 0;
-                $score->user_id = $user->id;
-                $score->save();
-                $response = "Usuario registrado";
-            }catch(\Exception $e){
-                $response = $e->getMessage();
-            }
+        //Crear score y asignar
 
-		}else{
-			$response = "No has introducido un usuario válido";
-		}
-
-        return response()->json($response);
-
+        return $this->successResponse($user,'User Created', 201);
     }
+
+    public function login(Request $request){
+        $validator = $this->validateUsername();
+        if ($validator->fails()){
+            return $this->errorResponse($validator->messages(), 422);
+        }
+
+        $user = User::where('username',$request->username)->firstOrFail();
+        if(Hash::check($request->password,$user->password)){
+            //JWT
+            return $this->successResponse($user);
+        }
+            return $this->errorResponse('Password Wrong',401);
+    }
+    
     /** POST
      * Login de usuarios en la app. /users/login
      *
@@ -75,7 +81,7 @@ class UserController extends Controller
      * @param $request Petición con los datos de login del usuario
      * @return $response Respuesta de la api con el token del usuario 
      */
-    public function login(Request $request){
+    public function loginaa(Request $request){
 
         $response = [];
 		$data = $request->getContent();
@@ -593,5 +599,22 @@ class UserController extends Controller
     
     }
 
+    public function validateUser(){
+        return Validator::make(request()->all(), [
+            'name' => 'required|string|max:30',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:6',
+            'username' => 'required|string|max:25|unique:users',
+            'surname' => 'required|string|max:50',
+            'profile_pic' => 'url|null',
+            'date_of_birth' => 'required|date'
+        ]);
+    }
+
+    public function validateUsername(){
+        return Validator::make(request()->all(), [
+            'username' => 'required|string|max:25',
+        ]);
+    }
 }
  

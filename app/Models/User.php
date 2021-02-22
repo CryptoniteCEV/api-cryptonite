@@ -9,6 +9,9 @@ class user extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['email', 'name','username','surname','profile_pic','password','date_of_birth'];
+    protected $hidden = ['password','updated_at','created_at'];
+    
     public function score()
     {
         return $this->hasOne(Score::class);
@@ -21,5 +24,5 @@ class user extends Model
     public function currency(){
         return $this->belongsToMany(currency::class, "wallets")->withPivot('quantity');
     }
-
+    
 }
