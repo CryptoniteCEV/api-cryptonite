@@ -12,19 +12,19 @@ use App\Http\Controllers\ScoreController;
 Route::prefix('users')->group(function () {
 	Route::post('/register',[UserController::class, 'register']); // Done
 	Route::post('/login',[UserController::class, 'login']); // Done
-	Route::post('/restore/password',[UserController::class, 'restore_password']); // Done
-	Route::post('/update/password',[UserController::class, 'change_password'])->middleware('EnsureTokenIsValid'); // Done
+	Route::put('/restore/password',[UserController::class, 'restore_password_validation']); // Done
+	Route::put('/update/password',[UserController::class, 'change_password'])->middleware('EnsureTokenIsValid'); // Done
 	Route::get('profile/info',[UserController::class, 'profile_info'])->middleware('EnsureTokenIsValid'); // Done
 	Route::get('user/info/{id}',[UserController::class, 'following_info'])->middleware('EnsureTokenIsValid'); // ¡¡¡¡¡¡NO HECHO!!!!!!!
-	Route::post('/update/profile',[UserController::class, 'update_profile'])->middleware('EnsureTokenIsValid'); // Done
-	Route::post('/follow/{username}',[UserController::class, 'follow_user'])->middleware('EnsureTokenIsValid'); // Done
+	Route::put('/update/profile',[UserController::class, 'update_profile'])->middleware('EnsureTokenIsValid'); // Done
+	Route::put('/follow/{username}',[UserController::class, 'follow_user'])->middleware('EnsureTokenIsValid'); // Done
 	Route::get('/followings/list',[UserController::class, 'followings_list'])->middleware('EnsureTokenIsValid'); // Done
-	Route::post('/update/exp/{newExp}',[UserController::class, 'update_exp'])->middleware('EnsureTokenIsValid');// Done
-	Route::post('/update/lvl/{newLvl}',[UserController::class, 'update_lvl'])->middleware('EnsureTokenIsValid');// Done	
+	Route::put('/update/exp/{newExp}',[UserController::class, 'update_exp'])->middleware('EnsureTokenIsValid');// Done
+	Route::put('/update/lvl/{newLvl}',[UserController::class, 'update_lvl'])->middleware('EnsureTokenIsValid');// Done	
 	Route::post('/trade',[UserController::class, 'trade_coins'])->middleware('EnsureTokenIsValid'); // Done
 	Route::get('/followers',[UserController::class, 'get_followers'])->middleware('EnsureTokenIsValid'); // Done
 	Route::get('/all',[UserController::class, 'get_users']);
-	Route::get('/delete',[UserController::class, 'delete_user'])->middleware('EnsureTokenIsValid');
+	Route::delete('/delete',[UserController::class, 'delete_user'])->middleware('EnsureTokenIsValid');
 
 });
 

@@ -88,6 +88,28 @@ class UserController extends ApiController
         
         return $this->errorResponse('Password Wrong',401);
     }
+
+     /**PUT
+     * Restaurar contraseña del usuario que no puede hacer login. /users/restore/password
+     *
+     * Llega en la peticion el email del usuario que ha olvidado la contraseña. Se genera una nueva contraseña 
+     * aleatoria y se le envia a su email
+     *
+     * @param $request Petición con el email del usuario
+     * @return $response Respuesta de la api con la nueva contraseña del usuario
+     */
+    public function restore_password_validation(Request $request){
+        $validator = $this->validateEmail();
+        if ($validator->fails()){
+            return $this->errorResponse($validator->messages(), 422);
+        }
+        $user = User::where('email',$request->email)->firstOrFail();
+
+        $new_password = Str::random(15);
+        $user->password = Hash::make($new_password);
+        $user->save();
+        return $this->successResponse($user);
+    }
     
     /**POST
      * Restaurar contraseña del usuario que no puede hacer login. /users/restore/password
@@ -581,6 +603,12 @@ class UserController extends ApiController
     public function validateUsername(){
         return Validator::make(request()->all(), [
             'username' => 'required|string|max:25',
+        ]);
+    }
+
+    public function validateEmail(){
+        return Validator::make(request()->all(), [
+            'email' => 'required|string|email|max:255',
         ]);
     }
 }
