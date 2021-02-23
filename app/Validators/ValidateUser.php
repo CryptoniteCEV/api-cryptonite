@@ -1,11 +1,12 @@
 <?php
-/*
+
 namespace App\Validators;
+
 use Illuminate\Support\Facades\Validator;
 
 class ValidateUser{
 
-    public function validateUser(){
+    public static function validateUser(){
         return Validator::make(request()->all(), [
             'name' => 'required|string|max:30',
             'email' => 'required|string|email|max:255|unique:users',
@@ -17,15 +18,21 @@ class ValidateUser{
         ]);
     }
 
-    public function validateUsername(){
+    public static function validateUsername(){
         return Validator::make(request()->all(), [
             'username' => 'required|string|max:25',
         ]);
     }
 
-    public function validateEmail(){
+    public static function validateEmail(){
         return Validator::make(request()->all(), [
             'email' => 'required|string|email|max:255',
+        ]);
+    }
+
+    public static function validateNewPassword(){
+        return Validator::make(request()->all(), [
+            'new_password' => 'required|string|min:6',
         ]);
     }
 }
