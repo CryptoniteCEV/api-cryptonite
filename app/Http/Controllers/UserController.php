@@ -58,20 +58,6 @@ class UserController extends ApiController
         return $this->successResponse($user,'User Created', 201);
     }
 
-    public function login(Request $request){
-        $validator = $this->validateUsername();
-        if ($validator->fails()){
-            return $this->errorResponse($validator->messages(), 422);
-        }
-
-        $user = User::where('username',$request->username)->firstOrFail();
-        if(Hash::check($request->password,$user->password)){
-            //JWT
-            return $this->successResponse($user);
-        }
-            return $this->errorResponse('Password Wrong',401);
-    }
-    
     /** POST
      * Login de usuarios en la app. /users/login
      *
@@ -81,46 +67,28 @@ class UserController extends ApiController
      * @param $request Petición con los datos de login del usuario
      * @return $response Respuesta de la api con el token del usuario 
      */
-    public function loginaa(Request $request){
+    public function login(Request $request){
 
-        $response = [];
-		$data = $request->getContent();
-        $data = json_decode($data);
-        
-        //$decoded = JWT::decode($data, env('PRIVATE_KEY'));
+        $validator = $this->validateUsername();
+        if ($validator->fails()){
+            return $this->errorResponse($validator->messages(), 422);
+        }
 
-        $user = User::where('username', $data->username)->get()->first();
-
-        if($user){
+        $user = User::where('username',$request->username)->firstOrFail();
+        if(Hash::check($request->password,$user->password)){
 
             $payload = array(            
                 'username' => $user->username
             );
 
             $jwt = JWT::encode($payload, env('PRIVATE_KEY'));
-            
-            if($data){
 
-                if (Hash::check($data->password, $user->password)) { 
-                    
-                    try{
-                        $user->save();
-                        $response = $jwt;
-                    }catch(\Exception $e){
-                        $response = $e->getMessage();
-                    }
-                }else{
-                    $response = "Usuario o contraseña no coinciden";
-                }
-            }
-        }else{
-            $response = "No User";
+            return $this->successResponse($jwt);
         }
-
-        return response()->json($response);
-
+        
+        return $this->errorResponse('Password Wrong',401);
     }
-
+    
     /**POST
      * Restaurar contraseña del usuario que no puede hacer login. /users/restore/password
      *

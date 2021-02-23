@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Score;
 
-use App\Http\Helpers\MyJWT;
 use \Firebase\JWT\JWT;
 
 class ScoreController extends Controller

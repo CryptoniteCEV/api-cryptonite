@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 
 use App\Models\User;
 
-use App\Http\Helpers\MyJWT;
 use \Firebase\JWT\JWT;
 
 class TradeController extends Controller

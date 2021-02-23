@@ -6,7 +6,6 @@ use Closure;
 use Illuminate\Http\Request;
 use App\Models\User;
 use \Firebase\JWT\JWT;
-use App\Http\Helpers\MyJWT;
 
 use Firebase\Auth\Token\Exception\InvalidToken;
 
