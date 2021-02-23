@@ -26,7 +26,7 @@ class EnsureTokenIsValid
             $separating_bearer = explode(" ", $headers['Authorization']);
             $jwt = $separating_bearer[1];
             
-            $decoded = JWT::decode($jwt, env('PRIVATE_KEY'));        
+            $decoded = JWT::decode($jwt, env('PRIVATE_KEY'), array('HS256'));        
         
             if($decoded){
 

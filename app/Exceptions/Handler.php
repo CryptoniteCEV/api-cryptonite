@@ -44,9 +44,12 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
-        $this->renderable(function (Exception $exception, $request) {
-            return $this->handleException($request, $exception);
+        $this->renderable(function (InvalidOrderException $e, $request) {
+            return response()->view('errors.invalid-order', [], 500);
         });
+        /*$this->renderable(function (Exception $exception, $request) {
+            return $this->handleException($request, $exception);
+        });*/
     }
 
     public function handleException($request, Exception $exception)

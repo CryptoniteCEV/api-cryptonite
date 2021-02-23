@@ -99,6 +99,7 @@ class UserController extends ApiController
      * @return $response Respuesta de la api con la nueva contraseña del usuario
      */
     public function restore_password(Request $request){
+
         $validator = $this->validateEmail();
         if ($validator->fails()){
             return $this->errorResponse($validator->messages(), 422);
@@ -120,14 +121,14 @@ class UserController extends ApiController
      * @param $request Petición con la antigua contraseña del usuario y la nueva
      * @return $response Respuesta de la api OK/Contraseña incorrecta
      */
-    public function change_password_validation(Request $request){
-        
+    public function change_password(Request $request){
+
         $headers = getallheaders();
         if(!array_key_exists('Authorization', $headers)){
             
             return $this->errorResponse("Forbidden", 403);
         }
-
+        
         $validator = $this->validatePassword();
         if ($validator->fails()){
             return $this->errorResponse($validator->messages(), 422);
@@ -135,66 +136,16 @@ class UserController extends ApiController
         
         $separating_bearer = explode(" ", $headers['Authorization']);
         $jwt = $separating_bearer[1];
-
-        $decoded = JWT::decode($jwt, env('PRIVATE_KEY'));    
+        
+        $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));    
             
-        $user = User::where('username', $decoded->username)->get()->firstOrFail();
-        $user->password = Hash::make($request->new_password);
+        $user = User::where('username', $decoded->username)->firstOrFail();
+        $user->password = Hash::make($request->password);
         $user->save();
 
         return $this->successResponse($user, "Password´s been modified");
     }
     
-
-    /**POST
-     * Cambiar la contraseña del usuario desde los ajustes de perfil de la app. /users/update/password
-     * 
-     * Llega en la petición la antigua contraseña del usuario y la nueva, si la contraseña antigua es correcta,
-     * se cambia por la nueva contraseña.
-     *
-     * @param $request Petición con la antigua contraseña del usuario y la nueva
-     * @return $response Respuesta de la api OK/Contraseña incorrecta
-     */
-    public function change_password(Request $request){
-        $response = "";
-        //Leer el contenido de la petición
-        $data = $request->getContent();
-        //Decodificar el json
-        $data = json_decode($data);
-        //Decodificar el token
-        $headers = getallheaders();
-        if(array_key_exists('Authorization', $headers)){
-            $separating_bearer = explode(" ", $headers['Authorization']);
-            $jwt = $separating_bearer[1];
-                
-            $decoded = JWT::decode($jwt, env('PRIVATE_KEY'));    
-            
-            // Buscar el usuario 
-            $user = User::where('username', $decoded->username)->get()->first();
-            
-            if($data){
-                // Si la contraseña guardada es correcta
-                //if(Hash::check($data->password, $user->password)){
-                    // Guardar la nueva contraseña
-                    $user->password = Hash::make($data->new_password);
-
-                    try{
-                        $user->save();
-                        $response = "OK";
-                    }catch(\Exception $e){
-                        $response = $e->getMessage();
-                    }
-                //}else $response = "Contraseña incorrecta";
-            
-            }else{
-
-                $response = $data;
-            }
-        }
-        // Enviar la respuesta
-        return response()->json($response);
-    }
-
     /**GET
      * Ver la informacion del perfil. /users/profile/info
      * 
@@ -205,28 +156,30 @@ class UserController extends ApiController
      * @return $response Respuesta de la api con la información del usuario
      */
     public function profile_info(Request $request){
-        $response = "";
-        //Decodificar el token
+        
         $headers = getallheaders();
-        $decoded = JWT::decode($headers['api_token'], env('PRIVATE_KEY'), array('HS256'));
-
-        // Buscar el usuario 
-        $user = User::where('username', $decoded->username)->get()->first();
-
-        if($user){
-            $response = [
-                "username" => $user->username,
-                "name" => $user->name,
-                "surname" => $user->surname,
-                "email" => $user->email,
-                "profile_pic" => $user->profile_pic
-            ];
-
-        } else {
-            $response = "Ese usuario no existe";
+        
+        if(!array_key_exists('Authorization', $headers)){
+            
+            return $this->errorResponse("Forbidden", 403);
         }
-        // Enviar la respuesta
-        return response()->json($response);
+
+        $separating_bearer = explode(" ", $headers['Authorization']);
+        $jwt = $separating_bearer[1];
+        
+        $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256")); 
+
+        $user = User::where('username', $decoded->username)->firstOrFail();
+
+        $response = [
+            "username" => $user->username,
+            "name" => $user->name,
+            "surname" => $user->surname,
+            "email" => $user->email,
+            "profile_pic" => $user->profile_pic
+        ];
+
+        return $this->successResponse($response);
     }
 
     /**GET
@@ -274,37 +227,38 @@ class UserController extends ApiController
      * @return $response Confirmación de los cambios
      */
     public function update_profile(Request $request){
-        $response = "";
-        //Leer el contenido de la petición
-        $data = $request->getContent();
-        //Decodificar el json
-        $data = json_decode($data);
-        //Decodificar el token
+
         $headers = getallheaders();
-        $decoded = JWT::decode($headers['api_token'], env('PRIVATE_KEY'), array('HS256'));
-
-        // Buscar el usuario 
-        $user = User::where('username', $decoded->username)->get()->first();
-
-        if($data){
-            $user->name = (isset($data->name) ? $data->name : $user->name);
-            $user->surname = (isset($data->surname) ? $data->surname : $user->surname);
-            $user->profile_pic = (isset($data->profile_pic) ? $data->profile_pic : $user->profile_pic);
-
-            try{
-                $user->save();
-               
-                $response = "OK";
-            }catch(\Exception $e){
-                $response = $e->getMessage();
-            }
+        
+        if(!array_key_exists('Authorization', $headers)){
             
+            return $this->errorResponse("Forbidden", 403);
         }
-        // Enviar la respuesta
-        return response()->json($response);
+        
+        $validator = $this->validateUpdate();
+
+        if ($validator->fails()){
+            return $this->errorResponse($validator->messages(), 422);
+        }
+        
+        $separating_bearer = explode(" ", $headers['Authorization']);
+        $jwt = $separating_bearer[1];
+        
+        $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
+
+        $user = User::where('username', $decoded->username)->firstOrFail();
+
+        $user->name = $request->has('name') ? $request->get('name') : $user->name;
+        $user->surname = $request->has('surname') ? $request->get('surname') : $user->surname;
+        $user->profile_pic = $request->has('profile_pic') ? $request->get('profile_pic') : $user->profile_pic;
+        $user->date_of_birth = $request->has('date_of_birth') ? $request->get('date_of_birth') : $user->date_of_birth;
+        
+        $user->save();
+        
+        return $this->successResponse($user);
     }
 
-    /**POST
+    /**PUT
      * Seguir a un usuario. /users/follow/{username}
      * 
      * Llega por url el nombre de usuario al que se va a seguir y se decodifica el token para obtener
@@ -611,6 +565,15 @@ class UserController extends ApiController
     public function validatePassword(){
         return Validator::make(request()->all(), [
             'password' => 'required|string|min:6'
+        ]);
+    }
+
+    public function validateUpdate(){
+        return Validator::make(request()->all(), [
+            'name' => 'string|max:30',
+            'surname' => 'string|max:50',
+            'profile_pic' => 'url',
+            'date_of_birth' => 'date'
         ]);
     }
 }
