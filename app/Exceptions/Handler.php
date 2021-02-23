@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Exceptions;
+namespace App\E0xceptions;
 
 use App\Traits\ApiResponser;
 use Exception;

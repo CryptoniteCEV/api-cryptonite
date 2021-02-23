@@ -10,6 +10,7 @@ use App\Models\Score;
 use App\Models\Currency;
 use App\Models\Trade;
 use App\Models\Wallet;
+use App\Validators\ValidateUser;
 
 use \Firebase\JWT\JWT;
 
