@@ -98,7 +98,7 @@ class UserController extends ApiController
      * @param $request Petición con el email del usuario
      * @return $response Respuesta de la api con la nueva contraseña del usuario
      */
-    public function restore_password_validation(Request $request){
+    public function restore_password(Request $request){
         $validator = $this->validateEmail();
         if ($validator->fails()){
             return $this->errorResponse($validator->messages(), 422);
@@ -108,46 +108,43 @@ class UserController extends ApiController
         $new_password = Str::random(15);
         $user->password = Hash::make($new_password);
         $user->save();
-        return $this->successResponse($user);
+        return $this->successResponse($user, "Password´s been modified");
+    }
+
+    /**PUT
+     * Cambiar la contraseña del usuario desde los ajustes de perfil de la app. /users/update/password
+     * 
+     * Llega en la petición la antigua contraseña del usuario y la nueva, si la contraseña antigua es correcta,
+     * se cambia por la nueva contraseña.
+     *
+     * @param $request Petición con la antigua contraseña del usuario y la nueva
+     * @return $response Respuesta de la api OK/Contraseña incorrecta
+     */
+    public function change_password_validation(Request $request){
+        
+        $headers = getallheaders();
+        if(!array_key_exists('Authorization', $headers)){
+            
+            return $this->errorResponse("Forbidden", 403);
+        }
+
+        $validator = $this->validatePassword();
+        if ($validator->fails()){
+            return $this->errorResponse($validator->messages(), 422);
+        }
+        
+        $separating_bearer = explode(" ", $headers['Authorization']);
+        $jwt = $separating_bearer[1];
+
+        $decoded = JWT::decode($jwt, env('PRIVATE_KEY'));    
+            
+        $user = User::where('username', $decoded->username)->get()->firstOrFail();
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return $this->successResponse($user, "Password´s been modified");
     }
     
-    /**POST
-     * Restaurar contraseña del usuario que no puede hacer login. /users/restore/password
-     *
-     * Llega en la peticion el email del usuario que ha olvidado la contraseña. Se genera una nueva contraseña 
-     * aleatoria y se le envia a su email
-     *
-     * @param $request Petición con el email del usuario
-     * @return $response Respuesta de la api con la nueva contraseña del usuario
-     */
-    public function restore_password(Request $request){
-        $response = "";
-        //Leer el contenido de la petición
-        $data = $request->getContent();
-        //Decodificar el json
-        $data = json_decode($data);
-        // Buscar el usuario por su email
-        $user = User::where('email', $data->email)->get()->first();
-
-        if($user){
-            // Generar una nueva contraseña aleatoria
-            $new_password = Str::random(15);
-            // Guardar la contraseña en la bbdd
-            $user->password = Hash::make($new_password);
-
-            try{
-                $user->save();
-                // Se envia la nueva contraseña al usuario
-                $response = "Tu nueva contraseña es: ".$new_password;
-            }catch(\Exception $e){
-                $response = $e->getMessage();
-            }
-        }else {
-            $response = "El email introducido no existe";
-        }
-        // Enviar la respuesta
-        return response()->json($response);
-    }
 
     /**POST
      * Cambiar la contraseña del usuario desde los ajustes de perfil de la app. /users/update/password
@@ -602,13 +599,18 @@ class UserController extends ApiController
 
     public function validateUsername(){
         return Validator::make(request()->all(), [
-            'username' => 'required|string|max:25',
+            'username' => 'required|string|max:25'
         ]);
     }
 
     public function validateEmail(){
         return Validator::make(request()->all(), [
-            'email' => 'required|string|email|max:255',
+            'email' => 'required|string|email|max:255'
+        ]);
+    }
+    public function validatePassword(){
+        return Validator::make(request()->all(), [
+            'password' => 'required|string|min:6'
         ]);
     }
 }

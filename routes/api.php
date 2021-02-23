@@ -12,7 +12,7 @@ use App\Http\Controllers\ScoreController;
 Route::prefix('users')->group(function () {
 	Route::post('/register',[UserController::class, 'register']); // Done
 	Route::post('/login',[UserController::class, 'login']); // Done
-	Route::put('/restore/password',[UserController::class, 'restore_password_validation']); // Done
+	Route::put('/restore/password',[UserController::class, 'restore_password']); // Done
 	Route::put('/update/password',[UserController::class, 'change_password'])->middleware('EnsureTokenIsValid'); // Done
 	Route::get('profile/info',[UserController::class, 'profile_info'])->middleware('EnsureTokenIsValid'); // Done
 	Route::get('user/info/{id}',[UserController::class, 'following_info'])->middleware('EnsureTokenIsValid'); // ¡¡¡¡¡¡NO HECHO!!!!!!!
