@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Currency;
+use App\Validators\ValidateCoin;
 
 use Illuminate\Http\Request;
 
@@ -35,6 +36,23 @@ class CurrencyController extends Controller
 		}else{
 			$response = "No has introducido una moneda válida";
 		}
+
+        $validator = ValidateCoin::validateCreate();
+
+        if($validator->fails()){
+            return $this->errorResponse($validator->messages(), 422);
+        }
+
+        $user = Currency::create([
+            //TODO
+            'name' => $request->get('name'),
+            'acronym' => $request->get('acronym'),
+            'value' => $request->get('value'),
+        ]);
+
+        //Crear score y asignar
+
+        return $this->successResponse($user,'User Created', 201);
 
         return response()->json($response);
 
