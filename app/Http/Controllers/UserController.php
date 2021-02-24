@@ -54,9 +54,17 @@ class UserController extends ApiController
             'date_of_birth' => $request->get('date_of_birth')
         ]);
 
-        //Crear score y asignar
+        $this->initiate_score($user->id);
 
         return $this->successResponse($user,'User Created', 201);
+    }
+
+    public function initiate_score($id){
+
+        $score = Score::create([
+            'user_id' => $id
+        ]);
+        
     }
 
     /** POST
@@ -74,7 +82,7 @@ class UserController extends ApiController
         if ($validator->fails()){
             return $this->errorResponse($validator->messages(), 422);
         }
-
+        //decode
         $user = User::where('username',$request->username)->firstOrFail();
         if(Hash::check($request->password,$user->password)){
 
@@ -277,7 +285,7 @@ class UserController extends ApiController
         $jwt = $separating_bearer[1];
         $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
 
-        $user = User::where('username', $decoded->username)->get()->first();
+        $user = User::where('username', $decoded->username)->firstOrFail();
         $followings_list = Following::where('follower_id', $user->id)->get();
         
         for ($i=0; $i < count($followings_list); $i++) { 
@@ -308,7 +316,7 @@ class UserController extends ApiController
         $jwt = $separating_bearer[1];
         $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
 
-        $user = User::where('username', $decoded->username)->get()->first();
+        $user = User::where('username', $decoded->username)->firstOrFail();
         $followers_list = Following::where('following_id', $user->id)->get();
         
         for ($i=0; $i < count($followers_list); $i++) { 
@@ -322,8 +330,8 @@ class UserController extends ApiController
         return $this->successResponse($response, 201);
     }
 
-    /**POST
-     * Actualizar la experiencia del usuario. /users/update/exp/{newExp}
+    /**PUT
+     * Actualizar la experiencia del usuario. /users/update/score
      *
      * Obtiene el usuario por su token y actualiza su experiencia (xp) que llega por url
      * en la tabla de scores.
@@ -332,67 +340,23 @@ class UserController extends ApiController
      * @param $newExp La cantidad de experiencia que tiene el usuario para actualizar en la tabla scores
      * @return $response Mensaje de confirmación
      */
-    public function update_exp(Request $request, $newExp){
-        $response = "";
-        //Leer el contenido de la petición
-        $data = $request->getContent();
-        //Decodificar el json
-        $data = json_decode($data);
-        //Decodificar el token
-        $headers = getallheaders();
-        $decoded = JWT::decode($headers['api_token'], env('PRIVATE_KEY'), array('HS256'));
+    public function update_user_exp(Request $request){
 
-        // Buscar el usuario 
-        $user = User::where('username', $decoded->username)->get()->first();
-
-        if($user){
-            $score = Score::where('user_id', $user->id);
-
-            $score->experience = $newExp;            
-
-            try{
-                $score->save();               
-                $response = "OK";
-            }catch(\Exception $e){
-                $response = $e->getMessage();
-            }
-            
-        }else $response = "Ese usuario no existe";
-        // Enviar la respuesta
-        return response()->json($response);
-    }
-
-    /**POST
-     * Actualizar el nivel del usuario. /users/update/lvl/{newLvl}
-     * 
-     * Obtiene el usuario por su token y actualiza su nivel (lvl) que llega por url
-     * en la tabla de scores.
-     * 
-     * @param $request
-     * @param $new_level Nivel al que se va a actualzar en la tabla scores
-     * @return $response Mensaje de confirmación
-     */
-    public function update_lvl(Request $request, $new_level){
-        $response = "";
-        $headers = getallheaders();
-        $user = User::where('api_token', $headers['api_token'])->get()->first();
-
-        if ($user) {
-
-            $score = Score::where('user_id', $user->id)->get()->first();
-            $score->level = $new_level;
-
-            try{
-                $score->save();
-               
-                $response = "OK";
-            }catch(\Exception $e){
-                $response = $e->getMessage();
-            }
-        }else{
-            $response = "No valid user";
+        $validator = $this->validateExp();
+        if($validator->fails()){
+            return $this->errorResponse($validator->messages(), 422);
         }
-        return response()->json($response);
+        $headers = getallheaders();
+        $separating_bearer = explode(" ", $headers['Authorization']);
+        $jwt = $separating_bearer[1];
+        $decoded = JWT::decode($jwt, env('PRIVATE_KEY'), array("HS256"));
+
+        $user = User::where('username', $decoded->username)->firstOrFail();
+        $score = Score::where('user_id', $user->id)->firstOrFail();
+
+        $score->experience = $request->get('new_exp');
+        $score->save();
+        return $this->successResponse($score,"Exp. updated", 201);
     }
 
     /**POST
@@ -481,7 +445,7 @@ class UserController extends ApiController
     /**
      * Devuelve todos los usuarios
      */
-    public function delete_user() {
+    /*public function delete_user() {
         $response = [];
 
         //Decodificar el token
@@ -507,7 +471,7 @@ class UserController extends ApiController
 
         return response()->json($response);
     
-    }
+    }*/
 
     public function validateUser(){
         return Validator::make(request()->all(), [
@@ -552,6 +516,10 @@ class UserController extends ApiController
             'username' => 'string|required|max:25'
         ]);
     }
-    
+    public function validateExp(){
+        return Validator::make(request()->all(), [
+            'new_exp' => 'integer|required|max:255'
+        ]);
+    }
 }
  

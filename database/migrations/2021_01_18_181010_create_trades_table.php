@@ -17,7 +17,7 @@ class CreateTradesTable extends Migration
             $table->id();
             $table->integer('price');
             $table->integer('quantity');
-            $table->integer('is_sell');
+            $table->boolean('is_sell');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('currency_id')->constrained();
             $table->timestamps();
