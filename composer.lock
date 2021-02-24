@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8158f866054e42a1b10ee294d1114845",
+    "content-hash": "87f4293d4799becc414d6bae82dde51b",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -117,6 +117,60 @@
                 }
             ],
             "time": "2021-01-20T22:51:39+00:00"
+        },
+        {
+            "name": "codenix-sv/coingecko-api",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/codenix-sv/coingecko-api.git",
+                "reference": "7d899b3c6702937fe758b2df2ce6d68b7e4f7bf6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/codenix-sv/coingecko-api/zipball/7d899b3c6702937fe758b2df2ce6d68b7e4f7bf6",
+                "reference": "7d899b3c6702937fe758b2df2ce6d68b7e4f7bf6",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "php": "^7.2"
+            },
+            "require-dev": {
+                "guzzlehttp/guzzle": "~6.0",
+                "phpunit/phpunit": "^8.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Codenixsv\\CoinGeckoApi\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Volodymyr Svyryd",
+                    "email": "codenix.sv@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "PHP REST API client for coingecko.com",
+            "homepage": "https://github.com/codenix-sv/coingecko-api",
+            "keywords": [
+                "api",
+                "client",
+                "coingecko.com",
+                "php",
+                "rest"
+            ],
+            "support": {
+                "issues": "https://github.com/codenix-sv/coingecko-api/issues?state=open",
+                "source": "https://github.com/codenix-sv/coingecko-api"
+            },
+            "time": "2020-06-08T14:47:40+00:00"
         },
         {
             "name": "dnoegel/php-xdg-base-dir",

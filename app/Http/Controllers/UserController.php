@@ -11,6 +11,7 @@ use App\Models\Currency;
 use App\Models\Trade;
 use App\Models\Wallet;
 use App\Models\Following;
+use App\CoinGeckoTest\InitialTest;
 
 use \Firebase\JWT\JWT;
 
@@ -43,7 +44,7 @@ class UserController extends ApiController
         if($validator->fails()){
             return $this->errorResponse($validator->messages(), 422);
         }
-
+        
         $user = User::create([
             'name' => $request->get('name'),
             'password' => Hash::make($request->get('password')),
@@ -78,6 +79,10 @@ class UserController extends ApiController
      */
     public function login(Request $request){
 
+        $btc = InitialTest::getCoin();
+
+        var_dump($btc);
+        
         $validator = $this->validateUsername();
         if ($validator->fails()){
             return $this->errorResponse($validator->messages(), 422);
