@@ -17,13 +17,17 @@ Route::prefix('users')->group(function () {
 	Route::get('profile/info',[UserController::class, 'profile_info'])->middleware('EnsureTokenIsValid'); // Done
 	Route::get('user/info/{id}',[UserController::class, 'following_info'])->middleware('EnsureTokenIsValid'); // ¡¡¡¡¡¡NO HECHO!!!!!!!
 	Route::put('/update/profile',[UserController::class, 'update_profile'])->middleware('EnsureTokenIsValid'); // Done
-	Route::put('/follow/{username}',[UserController::class, 'follow_user'])->middleware('EnsureTokenIsValid'); // Done
-	Route::get('/followings/list',[UserController::class, 'followings_list'])->middleware('EnsureTokenIsValid'); // Done
+	Route::post('/follow',[UserController::class, 'follow_user'])->middleware('EnsureTokenIsValid'); // Done
+	Route::get('/all',[UserController::class, 'index']);
+	Route::get('/followings/list',[UserController::class, 'get_followings'])->middleware('EnsureTokenIsValid'); // Done
+	Route::get('/followers/list',[UserController::class, 'get_followers'])->middleware('EnsureTokenIsValid'); // Done
+
+	
 	Route::put('/update/exp/{newExp}',[UserController::class, 'update_exp'])->middleware('EnsureTokenIsValid');// Done
 	Route::put('/update/lvl/{newLvl}',[UserController::class, 'update_lvl'])->middleware('EnsureTokenIsValid');// Done	
 	Route::post('/trade',[UserController::class, 'trade_coins'])->middleware('EnsureTokenIsValid'); // Done
-	Route::get('/followers',[UserController::class, 'get_followers'])->middleware('EnsureTokenIsValid'); // Done
-	Route::get('/all',[UserController::class, 'get_users']);
+	
+	
 	Route::delete('/delete',[UserController::class, 'delete_user'])->middleware('EnsureTokenIsValid');
 
 });

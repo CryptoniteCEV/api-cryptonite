@@ -6,11 +6,12 @@ use Closure;
 use Illuminate\Http\Request;
 use App\Models\User;
 use \Firebase\JWT\JWT;
-
+use App\Traits\ApiResponser;
 use Firebase\Auth\Token\Exception\InvalidToken;
 
 class EnsureTokenIsValid
 {
+    use ApiResponser;
     /**
      * Handle an incoming request.
      *
@@ -21,22 +22,17 @@ class EnsureTokenIsValid
     public function handle(Request $request, Closure $next)
     {        
         $headers = getallheaders();
-        if(array_key_exists('Authorization', $headers)){
-        
-            $separating_bearer = explode(" ", $headers['Authorization']);
-            $jwt = $separating_bearer[1];
-            
-            $decoded = JWT::decode($jwt, env('PRIVATE_KEY'), array('HS256'));        
-        
-            if($decoded){
 
-                return $next($request);
-
-            }else{
-                abort(403, "Forbidden");
-            }
-        }else{
-            abort(403, "Token not passed");
+        if(!array_key_exists('Authorization', $headers)){
+            return $this->errorResponse("Forbidden", 403);
         }
+        
+        $separating_bearer = explode(" ", $headers['Authorization']);
+        $jwt = $separating_bearer[1];
+        
+        $decoded = JWT::decode($jwt, env('PRIVATE_KEY'), array('HS256'));        
+        
+        return $next($request);
+
     }
 }

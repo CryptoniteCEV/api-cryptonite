@@ -10,6 +10,7 @@ use App\Models\Score;
 use App\Models\Currency;
 use App\Models\Trade;
 use App\Models\Wallet;
+use App\Models\Following;
 
 use \Firebase\JWT\JWT;
 
@@ -182,42 +183,8 @@ class UserController extends ApiController
         return $this->successResponse($response);
     }
 
-    /**GET
-     * 
-     */
-    public function following_info(Request $request, $id){
-        $response = "";
 
-        // Buscar el usuario 
-        $user = User::find($id);
-
-        $response = [];
-
-        if($user){
-
-           $response [] = [
-                "username" => $user->username,
-                "profile_pic" => $user->profile_pic
-            ];
-            //
-            //
-            // HAY QUE REVISAR TODO ESTO, PROBABLEMENTE ES MEJOR PASARLO A TRADE Y HACERLO DESDE AHÍ
-            //
-            //
-            /*for ($i=0; $i < count($user->currency->pivot); $i++) { 
-                $response[$i]["price"] = $user->currency->pivot[$i]->price;
-                $response[$i]["quantity"] = $user->currency->pivot[$i]->quantity;
-                $response[$i]["currency"] = $user->currency->pivot[$i]->currency;
-            }*/
-              
-        } else {
-            $response = "Ese usuario no existe";
-        }
-        // Enviar la respuesta
-        return response()->json($response);
-    }
-
-    /**POST
+    /**PUT
      * Cambiar los datos del usuario. /users/update/profile
      *
      * Llega en la petición la información que el usuario quiere modificar y se
@@ -258,7 +225,7 @@ class UserController extends ApiController
         return $this->successResponse($user);
     }
 
-    /**PUT
+    /**POST
      * Seguir a un usuario. /users/follow/{username}
      * 
      * Llega por url el nombre de usuario al que se va a seguir y se decodifica el token para obtener
@@ -268,35 +235,29 @@ class UserController extends ApiController
      * @param $username Nombre del usuario al que se va a seguir
      * @return $response Confirmación de seguimiento
      */
-    public function follow_user(Request $request, $username){
-        $response = "";
+    public function follow_user(Request $request){
         
-        //Decodificar el token
+        $validator = $this->validateFollowing();
+
+        if ($validator->fails()){
+            return $this->errorResponse($validator->messages(), 422);
+        }
+
         $headers = getallheaders();
-        $decoded = JWT::decode($headers['api_token'], env('PRIVATE_KEY'), array('HS256'));
+        $separating_bearer = explode(" ", $headers['Authorization']);
+        $jwt = $separating_bearer[1];
+        $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
 
-        // Buscar el usuario 
-        $user_who_follow = User::where('username', $decoded->username)->get()->first();
+        $follower = User::where('username', $decoded->username)->firstOrFail();
+        
+        $following = User::where('username', $request->get('username'))->firstOrFail();
 
-        $user_who_is_followed = User::where('username', $username)->get()->first();
+        Following::create([
+            'following_id' => $following->id,
+            'follower_id' => $follower->id
+        ]);
 
-        if($user_who_is_followed){
-            $following = New Following();
-
-            $following->following_id = $user_who_is_followed->id;
-            $following->follower_id = $user_who_follow->id;
-
-            try{
-                $following->save();
-               
-                $response = "OK";
-            }catch(\Exception $e){
-                $response = $e->getMessage();
-            }
-            
-        }else $response = "Ese usuario no existe";
-        // Enviar la respuesta
-        return response()->json($response);
+        return $this->successResponse("You are now following " . $following->username);
     }
 
     /**GET
@@ -308,30 +269,57 @@ class UserController extends ApiController
      * @param $request
      * @return $response Lista de los usuarios a los que sigue o No sigues a nadie
      */
-    public function followings_list(Request $request){
-        $response = [];
-        //Decodificar el token
-        $headers = getallheaders();
-        $decoded = JWT::decode($headers['api_token'], env('PRIVATE_KEY'), array('HS256'));
+    public function get_followings(Request $request){
 
-        // Buscar el usuario 
+        $response = [];
+        $headers = getallheaders();
+        $separating_bearer = explode(" ", $headers['Authorization']);
+        $jwt = $separating_bearer[1];
+        $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
+
         $user = User::where('username', $decoded->username)->get()->first();
         $followings_list = Following::where('follower_id', $user->id)->get();
         
-
-        if($followings_list){
-            for ($i=0; $i < count($followings_list); $i++) { 
-                $user_followed = User::find($followings_list[$i]->following_id);
-                $response = [
+        for ($i=0; $i < count($followings_list); $i++) { 
+            $user_followed = User::find($followings_list[$i]->following_id);
+            $response[] = [
                 "username" => $user_followed->username,
                 "profile_pic" => $user_followed->profile_pic
             ];
-            }
-        } else {
-            $response = "No sigues a ningún usuario";
         }
-        // Enviar la respuesta
-        return response()->json($response);
+
+        return $this->successResponse($response, 201);
+    }
+
+    /**GET
+     * Ver la lista de tus seguidores /users/followers
+     *
+     * Se obtiene el usuario que realiza la peticion decodificando su token y se comprueban los
+     * usuarios que le siguen en la fabla followings con su id de usuario en following_id.
+     *
+     * @param $request
+     * @return $response Lista con los seguidores/ No tienes seguidores 
+     */
+    public function get_followers(Request $request) {
+
+        $response = [];
+        $headers = getallheaders();
+        $separating_bearer = explode(" ", $headers['Authorization']);
+        $jwt = $separating_bearer[1];
+        $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
+
+        $user = User::where('username', $decoded->username)->get()->first();
+        $followers_list = Following::where('following_id', $user->id)->get();
+        
+        for ($i=0; $i < count($followers_list); $i++) { 
+            $user_followed = User::find($followers_list[$i]->follower_id);
+            $response[] = [
+                "username" => $user_followed->username,
+                "profile_pic" => $user_followed->profile_pic
+            ];
+        }
+
+        return $this->successResponse($response, 201);
     }
 
     /**POST
@@ -454,59 +442,41 @@ class UserController extends ApiController
         return response()->json($response);
     }
 
-    /**GET
-     * Ver la lista de tus seguidores /users/followers
-     *
-     * Se obtiene el usuario que realiza la peticion decodificando su token y se comprueban los
-     * usuarios que le siguen en la fabla followings con su id de usuario en following_id.
-     *
-     * @param $request
-     * @return $response Lista con los seguidores/ No tienes seguidores 
-     */
-    public function get_followers(Request $request) {
-        $response =[];
-        $headers = getallheaders();
-        $decoded = JWT::decode($headers['api_token'], env('PRIVATE_KEY'), array('HS256'));
-
-        $user = User::where('username', $decoded->username)->get()->first();
-        $followers_list = Following::where('following_id', $user->id)->get();
-
-        if($followers_list){
-            for ($i=0; $i < count($followers_list); $i++) { 
-                $user_follower = User::find($followers_list[$i]->follower_id);
-                $response = [
-                "username" => $user_follower->username,
-                "profile_pic" => $user_follower->profile_pic
-            ];
-            }
-        } else {
-            $response = "No te sigue ningún usuario";
-        }
-        return response()->json($response);
-    }
-
     /**
-     * Devuelve todos los usuarios
+     * TODO
      */
-    public function get_users() {
-        $response =[];
-        $users = User::all();
+    public function following_info(Request $request, $id){
+        $response = "";
 
-        if($users){
-            for ($i=0; $i <count($users) ; $i++) { 
-                $response[$i] = [
-                    "username" => $users[$i]->username,
-                    "profile_pic" => $users[$i]->profile_pic,
-                    "name" => $users[$i]->name,
-                    "surname" => $users[$i]->surname,
-                    "email" => $users[$i]->email
-                ];
-            } 
+        // Buscar el usuario 
+        $user = User::find($id);
+
+        $response = [];
+
+        if($user){
+
+           $response [] = [
+                "username" => $user->username,
+                "profile_pic" => $user->profile_pic
+            ];
+            //
+            //
+            // HAY QUE REVISAR TODO ESTO, PROBABLEMENTE ES MEJOR PASARLO A TRADE Y HACERLO DESDE AHÍ
+            //
+            //
+            /*for ($i=0; $i < count($user->currency->pivot); $i++) { 
+                $response[$i]["price"] = $user->currency->pivot[$i]->price;
+                $response[$i]["quantity"] = $user->currency->pivot[$i]->quantity;
+                $response[$i]["currency"] = $user->currency->pivot[$i]->currency;
+            }*/
+              
         } else {
-            $response = "No hay users";
+            $response = "Ese usuario no existe";
         }
+        // Enviar la respuesta
         return response()->json($response);
     }
+
 
     /**
      * Devuelve todos los usuarios
@@ -576,5 +546,12 @@ class UserController extends ApiController
             'date_of_birth' => 'date'
         ]);
     }
+
+    public function validateFollowing(){
+        return Validator::make(request()->all(), [
+            'username' => 'string|required|max:25'
+        ]);
+    }
+    
 }
  
