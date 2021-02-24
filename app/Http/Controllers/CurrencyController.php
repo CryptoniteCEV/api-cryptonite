@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Currency;
+use App\Validators\ValidateCoin;
 
 use Illuminate\Http\Request;
 
@@ -17,27 +18,22 @@ class CurrencyController extends Controller
      */
     public function createCurrency(Request $request){
 
-        $response = "";
-		$data = $request->getContent();
-        $data = json_decode($data);
-        
-		if($data){
+        $validator = ValidateCoin::validateCreate();
 
-            $currency = new Currency();
-            $currency->name = $data->name;
+        if($validator->fails()){
+            return $this->errorResponse($validator->messages(), 422);
+        }
 
-            try{
-                $currency->save();
-                $response = "Moneda registrada";
-            }catch(\Exception $e){
-                $response = $e->getMessage();
-            }
-		}else{
-			$response = "No has introducido una moneda válida";
-		}
+        $user = Currency::create([
+            //TODO
+            'name' => $request->get('name'),
+            'acronym' => $request->get('acronym'),
+            'value' => $request->get('value'),
+        ]);
 
-        return response()->json($response);
+        //Crear score y asignar
 
+        return $this->successResponse($user,'User Created', 201);
     }
 
     /**GET
