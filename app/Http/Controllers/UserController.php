@@ -12,6 +12,9 @@ use App\Models\Trade;
 use App\Models\Wallet;
 use App\Models\Following;
 
+use App\Validators\ValidateUser;
+use App\Validators\ValidateCoin;
+
 use \Firebase\JWT\JWT;
 
 use Illuminate\Http\Request;
@@ -38,7 +41,7 @@ class UserController extends ApiController
      */
     public function register(Request $request){
 
-        $validator = $this->validateUser();
+        $validator = ValidateUser::validate_create();
 
         if($validator->fails()){
             return $this->errorResponse($validator->messages(), 422);
@@ -78,7 +81,7 @@ class UserController extends ApiController
      */
     public function login(Request $request){
 
-        $validator = $this->validateUsername();
+        $validator = ValidateUser::validate_username();
         if ($validator->fails()){
             return $this->errorResponse($validator->messages(), 422);
         }
@@ -109,7 +112,7 @@ class UserController extends ApiController
      */
     public function restore_password(Request $request){
 
-        $validator = $this->validateEmail();
+        $validator = ValidateUser::validate_email();
         if ($validator->fails()){
             return $this->errorResponse($validator->messages(), 422);
         }
@@ -210,7 +213,7 @@ class UserController extends ApiController
             return $this->errorResponse("Forbidden", 403);
         }
         
-        $validator = $this->validateUpdate();
+        $validator = ValidateUser::validate_uupdate();
 
         if ($validator->fails()){
             return $this->errorResponse($validator->messages(), 422);
@@ -245,7 +248,7 @@ class UserController extends ApiController
      */
     public function follow_user(Request $request){
         
-        $validator = $this->validateFollowing();
+        $validator = ValidateUser::validate_following();
 
         if ($validator->fails()){
             return $this->errorResponse($validator->messages(), 422);
@@ -342,7 +345,7 @@ class UserController extends ApiController
      */
     public function update_user_exp(Request $request){
 
-        $validator = $this->validateExp();
+        $validator = ValidateUser::validate_exp();
         if($validator->fails()){
             return $this->errorResponse($validator->messages(), 422);
         }
@@ -473,53 +476,5 @@ class UserController extends ApiController
     
     }*/
 
-    public function validateUser(){
-        return Validator::make(request()->all(), [
-            'name' => 'required|string|max:30',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6',
-            'username' => 'required|string|max:25|unique:users',
-            'surname' => 'required|string|max:50',
-            'profile_pic' => 'url|null',
-            'date_of_birth' => 'required|date'
-        ]);
-    }
-
-    public function validateUsername(){
-        return Validator::make(request()->all(), [
-            'username' => 'required|string|max:25'
-        ]);
-    }
-
-    public function validateEmail(){
-        return Validator::make(request()->all(), [
-            'email' => 'required|string|email|max:255'
-        ]);
-    }
-    public function validatePassword(){
-        return Validator::make(request()->all(), [
-            'password' => 'required|string|min:6'
-        ]);
-    }
-
-    public function validateUpdate(){
-        return Validator::make(request()->all(), [
-            'name' => 'string|max:30',
-            'surname' => 'string|max:50',
-            'profile_pic' => 'url',
-            'date_of_birth' => 'date'
-        ]);
-    }
-
-    public function validateFollowing(){
-        return Validator::make(request()->all(), [
-            'username' => 'string|required|max:25'
-        ]);
-    }
-    public function validateExp(){
-        return Validator::make(request()->all(), [
-            'new_exp' => 'integer|required|max:255'
-        ]);
-    }
 }
  
