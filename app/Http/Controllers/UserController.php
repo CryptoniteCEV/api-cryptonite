@@ -79,8 +79,8 @@ class UserController extends ApiController
      */
     public function login(Request $request){
 
-        print_r(CoinGecko::getPrice("dogecoin","usd"));
-       
+        //echo CoinGecko::getPrice("bitcoin","usd");
+        print_r(CoinGecko::getCoins());
         //print_r(CoinGecko::getHistoryInDays("bitcoin", "usd", 30));
         //print_r(CoinGecko::getPriceAtDay('bitcoin','30-12-2019'));
         

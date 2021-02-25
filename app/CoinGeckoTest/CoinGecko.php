@@ -61,13 +61,14 @@ class CoinGecko{
 /** UPDATED VENDORS CLASS
  *  Added OHLC method to vendors\codenix-sv\src\api\Coins.php
  *  Must add this method for each new machine
-    public function getOHLC(string $id, string $vsCurrency, int $days): array
-    {
-        $params['vs_currency'] = $vsCurrency;
-        $params['days'] = $days;
-
-        return $this->get('/coins/' . $id .'/ohlc', $params);
-    }
+ *   public function getOHLC(string $id, string $vsCurrency, int $days): array
+ *  {
+ *       $params['vs_currency'] = $vsCurrency;
+ *      $params['days'] = $days;
+ *
+ *       return $this->get('/coins/' . $id .'/ohlc', $params);
+ *   }
+ * 
 */
 
 
