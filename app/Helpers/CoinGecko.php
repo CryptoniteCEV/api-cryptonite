@@ -1,6 +1,6 @@
 <?php
 
-namespace App\CoinGeckoTest;
+namespace App\Helpers;
 
 use Codenixsv\CoinGeckoApi\CoinGeckoClient;
 
@@ -10,7 +10,8 @@ class CoinGecko{
      * @return the current price for a @param $coin in a specific @param $currency
      */
     public static function getPrice($coin, $currency){
-        $client = new CoinGeckoClient();               
+        $client = new CoinGeckoClient();     
+        $coin = strtolower($coin);   
         $data = $client->simple()->getPrice($coin, $currency);
         return $data[$coin][$currency];
     }

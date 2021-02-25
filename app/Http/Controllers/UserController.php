@@ -365,7 +365,7 @@ class UserController extends ApiController
         $jwt = Token::get_token_from_headers($headers);
         $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
 
-        $user = User::where('username', $decoded->username)->firstOrFail();
+        $user = User::findOrFail($decoded->id);
         $currency = Currency::where('symbol', $coin)->firstOrFail();
 
         $wallets = Wallet::where('user_id', $user->id)->get();
@@ -452,38 +452,6 @@ class UserController extends ApiController
         
         return $this->successResponse($user_info, 201);
     }
-
-
-    /**
-     * Devuelve todos los usuarios
-     */
-    /*public function delete_user() {
-        $response = [];
-
-        //Decodificar el token
-        $headers = getallheaders();
-        //print_r(getallheaders());
-        $decoded = JWT::decode($headers['api_token'], env('PRIVATE_KEY'), array('HS256'));
-        $response = $headers['api_token'];
-        // Buscar el usuario 
-        $user = User::where('username', $decoded->username)->get()->first();
-    
-        if($user){
-
-            try{
-                $user->delete();
-                $response = "Deleted";
-            }catch(\Exception $e){
-                $response = $e->getMessage();
-            }
-                        
-        }else{
-            $response = "No user with the same username";
-        }
-
-        return response()->json($response);
-    
-    }*/
 
 }
  

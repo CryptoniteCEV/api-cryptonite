@@ -8,6 +8,8 @@ use App\Constants\Coin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ApiController;
 
+use App\Helpers\CoinGecko;
+
 class CurrencyController extends ApiController
 {
     /**POST
@@ -63,14 +65,18 @@ class CurrencyController extends ApiController
 
         $response = [];
         $currencies = Currency::all();
+        
+        for ($i=0; $i < count($currencies); $i++) { 
 
-        foreach ($currencies as $currency) {
-            
-            $response[] = [
-                "Name" => $currency->name,
-                "Symbol" => $currency->symbol
-                //precio
+            $response[$i] = [
+                "Name" => $currencies[$i]->name,
+                "Symbol" => $currencies[$i]->symbol
             ];
+            if($currencies[$i]->name == "Dollar"){
+                $response[$i]['Price'] = 1;
+            }else{
+                $response[$i]['Price'] = CoinGecko::getPrice($currencies[$i]->name, 'usd');
+            }
         }
 
         return $this->successResponse($response, 201);
