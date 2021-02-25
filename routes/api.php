@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WalletController;
+use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\TradeController;
 use App\Http\Controllers\ScoreController;
 
@@ -47,8 +48,9 @@ Route::prefix('wallets')->group(function () {
 
 });
 
-Route::prefix('currencies')->group(function () {
-    Route::post('/register',[WalletController::class, 'create_currency'])->middleware('EnsureTokenIsValid'); // Done
-	Route::get('/list',[WalletController::class, 'get_coins'])->middleware('EnsureTokenIsValid'); // Done
+Route::prefix('coins')->group(function () {
+	Route::post('/register',[CurrencyController::class, 'create_currency'])->middleware('EnsureTokenIsValid'); // Done
+	Route::post('/generate/all',[CurrencyController::class, 'generate_currencies']);//->middleware('EnsureTokenIsValid'); // Done
+	Route::get('/list',[CurrencyController::class, 'get_coins'])->middleware('EnsureTokenIsValid'); // Done
 
 });

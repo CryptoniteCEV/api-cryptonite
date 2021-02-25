@@ -4,11 +4,30 @@ namespace App\Http\Controllers;
 
 use App\Models\Currency;
 use App\Validators\ValidateCoin;
-
+use App\Constants\Coin;
 use Illuminate\Http\Request;
+use App\Http\Controllers\ApiController;
 
-class CurrencyController extends Controller
+class CurrencyController extends ApiController
 {
+    /**POST
+     * Registra todas las cryptos creadas previamente a la vez.
+     *
+     * Recibe nombre de la moneda a través de body para introducirla en la database
+     *
+     * @return $response Confirmación
+     */
+    public function generate_currencies(){
+        $coin = new Coin();
+        $cryptos = $coin->get_all();
+        foreach ($cryptos as $crypto) {
+            $currencies = Currency::create([
+                'name' => $crypto['name'],
+                'symbol' => $crypto['symbol']
+            ]);
+        }
+        return $this->successResponse($cryptos,'Cryptos created', 201);
+    }
     /**POST
      * Registra una nueva cryptomoneda. /currencies/register
      *
@@ -30,8 +49,6 @@ class CurrencyController extends Controller
             'acronym' => $request->get('acronym'),
             'value' => $request->get('value'),
         ]);
-
-        //Crear score y asignar
 
         return $this->successResponse($user,'User Created', 201);
     }

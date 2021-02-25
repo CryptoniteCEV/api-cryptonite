@@ -371,6 +371,7 @@ class UserController extends ApiController
         $quantity = $request->get('quantity');
         $is_sell = $request->get('is_sell');
         $coin = $request->get('coin');
+
         $coins_held = [];
 
         $headers = getallheaders();
@@ -397,7 +398,7 @@ class UserController extends ApiController
 
         $coin_position = array_search($currency->name, array_column($coins_held, 'currency_name'));
 
-        if($is_sell=='true'){
+        if($is_sell==1){
             if(!$coin_position){
                 return $this->errorResponse('No funds on this coin',422);
             }else{
@@ -407,15 +408,12 @@ class UserController extends ApiController
                 if($wallet_crypto->quantity<$quantity){
                     return $this->errorResponse('No funds on this coin',422);
                 }
-                $wallet_dollar = Wallet::find(1);
-                $wallet_crypto->quantity += $quantity_for_trade;
-                $wallet_dollar->quantity += $price;
-                $wallet_crypto->save();
-                $wallet_dollar->save();
+                $wallet_dollar = Wallet::where('currency_id','1')->firstOrFail();
+                $this->modify_wallet_quantities($wallet_crypto, $wallet_dollar, $quantity_for_trade, $price);
             }
         }else{
             $price = -$quantity;
-            $wallet_dollar = Wallet::find(1);
+            $wallet_dollar = Wallet::where('currency_id','1')->firstOrFail();
 
             if($wallet_dollar->quantity<$quantity){
                 return $this->errorResponse('No funds on this coin',422);
@@ -428,44 +426,29 @@ class UserController extends ApiController
                 
             }else{  
                 $wallet_crypto = Wallet::find($coins_held[$coin_position]['id']);
-                $wallet_crypto->quantity += $quantity;
-                $wallet_dollar->quantity += $price;
-                $wallet_crypto->save();
-                $wallet_dollar->save();
+                $this->modify_wallet_quantities($wallet_crypto, $wallet_dollar, $quantity,$price);
             }
         }
-        $trade = $this->initiate_trade($user->id, $currency->id,$request, $quantity);
+        $trade = $this->initiate_trade($user->id, $currency->id, $is_sell, $quantity, $quantity);
 
         return $this->successResponse($trade, "Trade successfully created",200);
 
     }
 
-    public function generate_trade($user, $currency, $request, $coins_held, $quantity, $price, $coin_position){
+    public function modify_wallet_quantities($wallet_crypto, $wallet_dollar, $quantity,$price){
 
-        if(!$coin_position){
-            
-            $this->initiate_wallet($user->id,$currency->id,$request->get('quantity'));
-            $wallet_dollar = Wallet::find(1);
-            $wallet_dollar->quantity += $price;
-            $wallet_dollar->save();
-            
-        }else{  
-            $wallet_crypto = Wallet::find($coins_held[$coin_position]['id']);
-            $wallet_dollar = Wallet::find(1);
-            $wallet_crypto->quantity += $quantity;
-            $wallet_dollar->quantity += $price;
-            $wallet_crypto->save();
-            $wallet_dollar->save();
-        }
-        $this->initiate_trade($user->id, $currency->id,$request, $request->get('quantity'));
+        $wallet_crypto->quantity += $quantity;
+        $wallet_dollar->quantity += $price;
+        $wallet_crypto->save();
+        $wallet_dollar->save();
     }
 
-    public function initiate_trade($user_id, $currency_id, $request, $price){
+    public function initiate_trade($user_id, $currency_id, $is_sell, $price, $quantity){
         //price es el precio en dollars no quantity
         return Trade::create([
             'price' => $price,
-            'quantity' => $request->get('quantity'),
-            'is_sell' => false,//$request->get('is_sell'),
+            'quantity' => $quantity,
+            'is_sell' => $is_sell,
             'user_id' => $user_id,
             'currency_id' => $currency_id
         ]);
