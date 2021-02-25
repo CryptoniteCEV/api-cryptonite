@@ -368,13 +368,17 @@ class UserController extends ApiController
      */
     public function trade_coin(Request $request){
 
+        $quantity = $request->get('quantity');
+        $is_sell = $request->get('is_sell');
+        $coin = $request->get('coin');
         $coins_held = [];
+
         $headers = getallheaders();
         $jwt = Token::get_token_from_headers($headers);
         $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
 
         $user = User::where('username', $decoded->username)->firstOrFail();
-        $currency = Currency::where('name', $request->get('coin'))->firstOrFail();
+        $currency = Currency::where('name', $coin)->firstOrFail();
 
         $wallets = Wallet::where('user_id', $user->id)->get();
 
@@ -385,32 +389,63 @@ class UserController extends ApiController
             ];
         }
 
-        if($request->get('is_sell')=='true'){
-            $quantity = -$request->get('quantity');
-            $price = $request->get('quantity');
-            $this->generate_trade($user, $currency, $request, $coins_held, $quantity , $price);
+        $validator_trade = ValidateUser::validate_trade();
 
-        }else{
-            
-            $quantity = $request->get('quantity');
-            $price = -$request->get('quantity');
-            $this->generate_trade($user, $currency, $request, $coins_held, $quantity , $price);
-
+        if ($validator_trade->fails()){
+            return $this->errorResponse($validator_trade->messages(), 422);
         }
-
-        return $this->successResponse($user, "Ha funcionado",200);
-
-    }
-
-    public function generate_trade($user, $currency, $request, $coins_held, $quantity, $price){
 
         $coin_position = array_search($currency->name, array_column($coins_held, 'currency_name'));
 
-        if(!$coin_position){
+        if($is_sell=='true'){
+            if(!$coin_position){
+                return $this->errorResponse('No funds on this coin',422);
+            }else{
+                $quantity_for_trade = -$quantity;
+                $price = $quantity;
+                $wallet_crypto = Wallet::find($coins_held[$coin_position]['id']);
+                if($wallet_crypto->quantity<$quantity){
+                    return $this->errorResponse('No funds on this coin',422);
+                }
+                $wallet_dollar = Wallet::find(1);
+                $wallet_crypto->quantity += $quantity_for_trade;
+                $wallet_dollar->quantity += $price;
+                $wallet_crypto->save();
+                $wallet_dollar->save();
+            }
+        }else{
+            $price = -$quantity;
+            $wallet_dollar = Wallet::find(1);
 
+            if($wallet_dollar->quantity<$quantity){
+                return $this->errorResponse('No funds on this coin',422);
+            }
+
+            if(!$coin_position){
+                $this->initiate_wallet($user->id,$currency->id,$quantity);
+                $wallet_dollar->quantity += $price;
+                $wallet_dollar->save();
+                
+            }else{  
+                $wallet_crypto = Wallet::find($coins_held[$coin_position]['id']);
+                $wallet_crypto->quantity += $quantity;
+                $wallet_dollar->quantity += $price;
+                $wallet_crypto->save();
+                $wallet_dollar->save();
+            }
+        }
+        $trade = $this->initiate_trade($user->id, $currency->id,$request, $quantity);
+
+        return $this->successResponse($trade, "Trade successfully created",200);
+
+    }
+
+    public function generate_trade($user, $currency, $request, $coins_held, $quantity, $price, $coin_position){
+
+        if(!$coin_position){
+            
             $this->initiate_wallet($user->id,$currency->id,$request->get('quantity'));
             $wallet_dollar = Wallet::find(1);
-            //Esto realmente no deberia ser quantity sino el precio en dollars (need coingecko request)
             $wallet_dollar->quantity += $price;
             $wallet_dollar->save();
             
@@ -418,7 +453,6 @@ class UserController extends ApiController
             $wallet_crypto = Wallet::find($coins_held[$coin_position]['id']);
             $wallet_dollar = Wallet::find(1);
             $wallet_crypto->quantity += $quantity;
-            //Esto realmente no deberia ser quantity sino el precio en dollars (need coingecko request)
             $wallet_dollar->quantity += $price;
             $wallet_crypto->save();
             $wallet_dollar->save();
@@ -428,7 +462,7 @@ class UserController extends ApiController
 
     public function initiate_trade($user_id, $currency_id, $request, $price){
         //price es el precio en dollars no quantity
-        Trade::create([
+        return Trade::create([
             'price' => $price,
             'quantity' => $request->get('quantity'),
             'is_sell' => false,//$request->get('is_sell'),

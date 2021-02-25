@@ -56,4 +56,19 @@ class ValidateUser{
             'new_exp' => 'integer|required|max:255'
         ]);
     }
+    public static function validate_trade(){
+        return Validator::make(request()->all(), [
+            'is_sell' => 'string|required|max:255',
+            'quantity' => 'integer|required',
+            'coin' => 'string|required|max:4'
+        ]);
+    }
+
+    public static function validate_wallet(){
+        return Validator::make(request()->all(), [
+            'user_id' => 'integer|required|max:5',
+            'quantity' => 'integer|required|max:255',
+            'currency_id' => 'integer|required|max:5'
+        ]);
+    }
 }
