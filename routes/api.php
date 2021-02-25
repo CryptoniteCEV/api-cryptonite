@@ -23,34 +23,26 @@ Route::prefix('users')->group(function () {
 	Route::get('/followings/list',[UserController::class, 'get_followings'])->middleware('EnsureTokenIsValid'); // Done
 	Route::get('/followers/list',[UserController::class, 'get_followers'])->middleware('EnsureTokenIsValid'); // Done
 	Route::put('/update/exp',[UserController::class, 'update_user_exp'])->middleware('EnsureTokenIsValid');// Done
-
-	Route::put('/update/lvl/{newLvl}',[UserController::class, 'update_lvl'])->middleware('EnsureTokenIsValid');// Done	
 	Route::post('/trade/coin',[UserController::class, 'trade_coin'])->middleware('EnsureTokenIsValid'); // Done
-	
-	
-	Route::delete('/delete',[UserController::class, 'delete_user'])->middleware('EnsureTokenIsValid');
+	Route::get('/trades/info',[UserController::class, 'trades_info'])->middleware('EnsureTokenIsValid');// Done	
 
 });
 
 Route::prefix('scores')->group(function () {
 	Route::get('/list',[ScoreController::class, 'score_list'])->middleware('EnsureTokenIsValid'); // Done
-
 });
 
 Route::prefix('trades')->group(function () {
 	Route::get('/history',[TradeController::class, 'trade_history'])->middleware('EnsureTokenIsValid'); // Done
-
 });
 
 Route::prefix('wallets')->group(function () {
-	Route::post('/deposit',[WalletController::class, 'deposit'])->middleware('EnsureTokenIsValid'); // Done
+	Route::put('/deposit',[WalletController::class, 'deposit'])->middleware('EnsureTokenIsValid'); // Done
 	Route::get('/info',[WalletController::class, 'wallet_info'])->middleware('EnsureTokenIsValid'); // Done
-
 });
 
 Route::prefix('coins')->group(function () {
-	Route::post('/register',[CurrencyController::class, 'create_currency'])->middleware('EnsureTokenIsValid'); // Done
+	Route::post('/create',[CurrencyController::class, 'create_currency'])->middleware('EnsureTokenIsValid'); // Done
 	Route::post('/generate/all',[CurrencyController::class, 'generate_currencies']);//->middleware('EnsureTokenIsValid'); // Done
 	Route::get('/list',[CurrencyController::class, 'get_coins'])->middleware('EnsureTokenIsValid'); // Done
-
 });

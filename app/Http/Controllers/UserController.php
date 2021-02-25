@@ -17,6 +17,7 @@ use App\Validators\ValidateCoin;
 
 use \Firebase\JWT\JWT;
 use \App\Helpers\Token;
+use \App\Helpers\InitiateEntry;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\ApiController;
@@ -48,34 +49,19 @@ class UserController extends ApiController
             return $this->errorResponse($validator->messages(), 422);
         }
 
-        $user = User::create([
-            'name' => $request->get('name'),
-            'password' => Hash::make($request->get('password')),
-            'email' => $request->get('email'),
-            'username' => $request->get('username'),
-            'surname' => $request->get('surname'),
-            'profile_pic' => $request->get('profile_pic'),
-            'date_of_birth' => $request->get('date_of_birth')
-        ]);
+        $username = $request->get('username');
+        $name = $request->get('name');
+        $password = $request->get('password');
+        $email = $request->get('email');
+        $surname = $request->get('surname');
+        $date_of_birth = $request->get('date_of_birth');
+        $profile_pic = $request->get('profile_pic');
 
-        $this->initiate_score($user->id);
-        $this->initiate_wallet($user->id, 1, 1000);
+        $user = InitiateEntry::user($name,$password,$email,$username,$surname,$profile_pic,$date_of_birth);
+
+        InitiateEntry::score($user->id);
+        InitiateEntry::wallet($user->id, 1, 1000);
         return $this->successResponse($user,'User Created', 201);
-    }
-
-    public function initiate_score($id){
-
-        $score = Score::create([
-            'user_id' => $id
-        ]);
-        
-    }
-    public function initiate_wallet($user_id, $currency_id, $quantity){
-        Wallet::create([
-            'quantity' => $quantity,
-            'user_id' => $user_id,
-            'currency_id' => $currency_id
-        ]);
     }
 
     /** POST
@@ -98,7 +84,8 @@ class UserController extends ApiController
         if(Hash::check($request->password,$user->password)){
 
             $payload = array(            
-                'username' => $user->username
+                'username' => $user->username,
+                'id' => $user->id
             );
 
             $jwt = JWT::encode($payload, env('PRIVATE_KEY'));
@@ -379,7 +366,7 @@ class UserController extends ApiController
         $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
 
         $user = User::where('username', $decoded->username)->firstOrFail();
-        $currency = Currency::where('name', $coin)->firstOrFail();
+        $currency = Currency::where('symbol', $coin)->firstOrFail();
 
         $wallets = Wallet::where('user_id', $user->id)->get();
 
@@ -420,7 +407,7 @@ class UserController extends ApiController
             }
 
             if(!$coin_position){
-                $this->initiate_wallet($user->id,$currency->id,$quantity);
+                InitiateEntry::wallet($user->id,$currency->id,$quantity);
                 $wallet_dollar->quantity += $price;
                 $wallet_dollar->save();
                 
@@ -429,7 +416,7 @@ class UserController extends ApiController
                 $this->modify_wallet_quantities($wallet_crypto, $wallet_dollar, $quantity,$price);
             }
         }
-        $trade = $this->initiate_trade($user->id, $currency->id, $is_sell, $quantity, $quantity);
+        $trade = InitiateEntry::trade($user->id, $currency->id, $is_sell, $quantity, $quantity);
 
         return $this->successResponse($trade, "Trade successfully created",200);
 
@@ -443,50 +430,27 @@ class UserController extends ApiController
         $wallet_dollar->save();
     }
 
-    public function initiate_trade($user_id, $currency_id, $is_sell, $price, $quantity){
-        //price es el precio en dollars no quantity
-        return Trade::create([
-            'price' => $price,
-            'quantity' => $quantity,
-            'is_sell' => $is_sell,
-            'user_id' => $user_id,
-            'currency_id' => $currency_id
-        ]);
-    }
-
     /**
-     * TODO
+     * GET info de usuario y sus tradeos
      */
-    public function following_info(Request $request, $id){
-        $response = "";
+    public function trades_info(Request $request){
 
-        // Buscar el usuario 
-        $user = User::find($id);
+        $user_info = [];
+        $user = User::where('username', $request->get('username'))->firstOrFail();
 
-        $response = [];
-
-        if($user){
-
-           $response [] = [
-                "username" => $user->username,
-                "profile_pic" => $user->profile_pic
-            ];
-            //
-            //
-            // HAY QUE REVISAR TODO ESTO, PROBABLEMENTE ES MEJOR PASARLO A TRADE Y HACERLO DESDE AHÍ
-            //
-            //
-            /*for ($i=0; $i < count($user->currency->pivot); $i++) { 
-                $response[$i]["price"] = $user->currency->pivot[$i]->price;
-                $response[$i]["quantity"] = $user->currency->pivot[$i]->quantity;
-                $response[$i]["currency"] = $user->currency->pivot[$i]->currency;
-            }*/
-              
-        } else {
-            $response = "Ese usuario no existe";
+        $user_info = [
+            "username" => $user->username,
+            "name" => $user->name,
+            "profile_pic" => $user->profile_pic,
+        ];
+        
+        for ($i=0; $i < count($user->currency); $i++) { 
+            $user_info[$i]["price"] = $user->currency[$i]->pivot->price;
+            $user_info[$i]["quantity"] = $user->currency[$i]->pivot->quantity;
+            $user_info[$i]["currency"] = $user->currency[$i]->name;
         }
-        // Enviar la respuesta
-        return response()->json($response);
+        
+        return $this->successResponse($user_info, 201);
     }
 
 

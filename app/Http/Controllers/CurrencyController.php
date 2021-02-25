@@ -35,22 +35,20 @@ class CurrencyController extends ApiController
      *
      * @return $response Confirmación
      */
-    public function createCurrency(Request $request){
+    public function create_currency(Request $request){
 
-        $validator = ValidateCoin::validateCreate();
+        $validator = ValidateCoin::validate_create();
 
         if($validator->fails()){
             return $this->errorResponse($validator->messages(), 422);
         }
 
-        $user = Currency::create([
-            //TODO
+        $coin = Currency::create([
             'name' => $request->get('name'),
-            'acronym' => $request->get('acronym'),
-            'value' => $request->get('value'),
+            'symbol' => $request->get('symbol')
         ]);
 
-        return $this->successResponse($user,'User Created', 201);
+        return $this->successResponse($coin,'coin Created', 201);
     }
 
     /**GET
@@ -61,19 +59,20 @@ class CurrencyController extends ApiController
      *
      * return $response Lista de monedas
      */
-    public function getCoins(){
+    public function get_coins(){
 
-        $request = [];
+        $response = [];
         $currencies = Currency::all();
 
         foreach ($currencies as $currency) {
             
-            $request = [
-                "Name" => $currency->name
-                //Próximamente necesitaremos su valor recogido de una api amiga
+            $response[] = [
+                "Name" => $currency->name,
+                "Symbol" => $currency->symbol
+                //precio
             ];
         }
 
-        return response()->json($request);
+        return $this->successResponse($response, 201);
     }
 }

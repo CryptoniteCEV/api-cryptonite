@@ -17,11 +17,11 @@ class user extends Model
         return $this->hasOne(Score::class);
     }
 
-    public function trade(){
-        return $this->belongsToMany(currency::class, "trades")->withPivot('price', 'quantity');
-    }
-
     public function currency(){
+        return $this->belongsToMany(currency::class, "trades")->withPivot('quantity', 'is_sell', 'price')->orderBy('price','asc');
+    }
+    
+    public function wallet(){
         return $this->belongsToMany(currency::class, "wallets")->withPivot('quantity');
     }
     

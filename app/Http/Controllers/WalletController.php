@@ -8,7 +8,15 @@ use App\Models\User;
 use App\Models\currency;
 use App\Models\wallet;
 
-class WalletController extends Controller
+use \Firebase\JWT\JWT;
+use \App\Helpers\Token;
+use App\Validators\ValidateWallet;
+use App\Http\Controllers\ApiController;
+use Illuminate\Support\Facades\Validator;
+
+use \App\Helpers\InitiateEntry;
+
+class WalletController extends ApiController
 {
     /**POST
      * Depositar una cantidad de "x" moneda en la cartera del usuario /wallets/deposit
@@ -20,42 +28,24 @@ class WalletController extends Controller
      * @return $response Confirmación del depósito
      */
     public function deposit(Request $request){
-        $response = "";
-		$data = $request->getContent();
-        $data = json_decode($data);
 
-        if ($data) {
-            $headers = getallheaders();
+        $headers = getallheaders();
+        $jwt = Token::get_token_from_headers($headers);
+        $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
 
-            $user = User::where('api_token', $headers['api_token'])->get()->first();
+        $validator = ValidateWallet::validate_create();
 
-            $coin = currency::where('name', $data->coin_name)->get()->first();
-
-            if ($user) {
-                if ($coin) {
-                    $wallet = new Wallet();
-
-                    $wallet->quantity = $data->quantity;
-                    $wallet->user_id = $user->id;
-                    $wallet->currency_id = $coin->id;
-
-                    try{
-                        $wallet->save();
-                        $response = "Deposited money";
-                    }catch(\Exception $e){
-                        $response = $e->getMessage();
-                    }
-
-                }else{
-                    $response = "No valid coin";
-                }
-            }else{
-                $response = "No valid user";
-            }
-        }else{
-            $response = "No valid data";
+        if ($validator->fails()){
+            return $this->errorResponse($validator->messages(), 422);
         }
-        return response($response);
+
+        $dollar = currency::where('symbol', 'usd')->firstOrFail();
+        $wallet = wallet::where('currency_id', $dollar->id)->where('user_id',$decoded->id)->firstOrFail();
+
+        $wallet->quantity += $request->get('quantity');
+        $wallet->save();
+
+        return $this->successResponse($wallet, 'Successfully deposited', 201);
     }
 
     /**GET
@@ -67,23 +57,20 @@ class WalletController extends Controller
      * @return $response en caso de que tenga alguna cryptomoneda, devuelve los datos de la cartera del usuario
      */
     public function wallet_info(){
-
+        $info = [];
         $headers = getallheaders();
+        $jwt = Token::get_token_from_headers($headers);
+        $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
 
-        $api_token = $headers['api_token'];
+        $user = user::find($decoded->id);
 
-        $user = User::where('api_token', $headers['api_token'])->get()->first();
+        for ($i=0; $i < count($user->wallet); $i++) { 
+            $info[$i] = [
+                "Coin" => $user->wallet[$i]->name,
+                "Quantity" => $user->wallet[$i]->pivot->quantity,
+            ];
+        }   
 
-        if ($user->currency) {
-            for ($i=0; $i < count($user->currency); $i++) { 
-                $response [$i] = [
-                    "Coin Name" => $user->currency[$i]->name,
-                    "Quantity" => $user->currency[$i]->pivot->quantity,
-                ];
-            }            
-        }else{
-            $response = "No wallet";
-        }
-        return response($response);
+        return $this->successResponse($info, 201);
     }
 }

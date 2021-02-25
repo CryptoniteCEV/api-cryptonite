@@ -4,42 +4,36 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use App\Models\User;
+use App\Models\Trade;
 
-use \Firebase\JWT\JWT;
+use App\Http\Controllers\ApiController;
 
-class TradeController extends Controller
+class TradeController extends ApiController
 {
     /**GET
      * Ver la lista de trades de un usuario
      * 
-     * Muestra la lista de trades del usuario. Lo busca por el token y devuelve el nombre de la moneda
+     * Muestra la lista de trades global. Lo busca por el token y devuelve el nombre de la moneda
      * comprada o vendida, el precio al que se realizó la transacción y la cantidad
      *
      * @return $response La lista de los trades realizados por el usuario
      */
     public function trade_history()
     {
-        $headers = getallheaders();
-
-        $api_token = $headers['api_token'];
-
-        $user = User::where('api_token', $headers['api_token'])->get()->first();
-
-        if ($user) {
-            for ($i=0; $i < count($user->trade); $i++) { 
-                $response [$i] = [
-                    "Coin Name" => $user->trade[$i]->name,
-                    "Price" => $user->trade[$i]->pivot->price,
-                    "Quantity" => $user->trade[$i]->pivot->quantity,
-                    "Is sell" => $user->trade[$i]->pivot->is_sale
-                ];
-            }
-            
-        }else{
-            $response = "no user";
+        $info = [];
+        $trades = Trade::all();
+        
+        for ($i=0; $i < count($trades); $i++) { 
+            $info[$i] = [
+                "Coin Name" => $trades[$i]->currency->name,
+                "Price" => $trades[$i]->price,
+                "Quantity" => $trades[$i]->quantity,
+                "Is sell" => $trades[$i]->is_sell,
+                "User" => $trades[$i]->user->name
+            ];
         }
-        return response()->json($response);
+            
+        return $this->successResponse($info, 201);
     }
     
 }
