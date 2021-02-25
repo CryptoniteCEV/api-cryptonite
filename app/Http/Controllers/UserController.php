@@ -11,7 +11,7 @@ use App\Models\Currency;
 use App\Models\Trade;
 use App\Models\Wallet;
 use App\Models\Following;
-use App\CoinGeckoTest\InitialTest;
+use App\CoinGeckoTest\CoinGecko;
 
 use \Firebase\JWT\JWT;
 
@@ -79,9 +79,10 @@ class UserController extends ApiController
      */
     public function login(Request $request){
 
-        $btc = InitialTest::getCoin();
-
-        var_dump($btc);
+        print_r(CoinGecko::getPrice("dogecoin","usd"));
+       
+        //print_r(CoinGecko::getHistoryInDays("bitcoin", "usd", 30));
+        //print_r(CoinGecko::getPriceAtDay('bitcoin','30-12-2019'));
         
         $validator = $this->validateUsername();
         if ($validator->fails()){
