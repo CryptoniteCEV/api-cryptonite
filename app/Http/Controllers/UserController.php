@@ -16,6 +16,7 @@ use App\Validators\ValidateUser;
 use App\Validators\ValidateCoin;
 
 use \Firebase\JWT\JWT;
+use \App\Helpers\Token;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\ApiController;
@@ -58,7 +59,7 @@ class UserController extends ApiController
         ]);
 
         $this->initiate_score($user->id);
-
+        $this->initiate_wallet($user->id, 1, 1000);
         return $this->successResponse($user,'User Created', 201);
     }
 
@@ -68,6 +69,13 @@ class UserController extends ApiController
             'user_id' => $id
         ]);
         
+    }
+    public function initiate_wallet($user_id, $currency_id, $quantity){
+        Wallet::create([
+            'quantity' => $quantity,
+            'user_id' => $user_id,
+            'currency_id' => $currency_id
+        ]);
     }
 
     /** POST
@@ -136,7 +144,7 @@ class UserController extends ApiController
     public function change_password(Request $request){
 
         $headers = getallheaders();
-        if(!array_key_exists('Authorization', $headers)){
+        if(!Token::is_auth_passed()){
             
             return $this->errorResponse("Forbidden", 403);
         }
@@ -146,9 +154,7 @@ class UserController extends ApiController
             return $this->errorResponse($validator->messages(), 422);
         }
         
-        $separating_bearer = explode(" ", $headers['Authorization']);
-        $jwt = $separating_bearer[1];
-        
+        $jwt = Token::get_token_from_headers($headers);
         $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));    
             
         $user = User::where('username', $decoded->username)->firstOrFail();
@@ -171,14 +177,12 @@ class UserController extends ApiController
         
         $headers = getallheaders();
         
-        if(!array_key_exists('Authorization', $headers)){
+        if(!Token::is_auth_passed()){
             
             return $this->errorResponse("Forbidden", 403);
         }
 
-        $separating_bearer = explode(" ", $headers['Authorization']);
-        $jwt = $separating_bearer[1];
-        
+        $jwt = Token::get_token_from_headers($headers);
         $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256")); 
 
         $user = User::where('username', $decoded->username)->firstOrFail();
@@ -208,7 +212,7 @@ class UserController extends ApiController
 
         $headers = getallheaders();
         
-        if(!array_key_exists('Authorization', $headers)){
+        if(!Token::is_auth_passed($headers)){
             
             return $this->errorResponse("Forbidden", 403);
         }
@@ -219,9 +223,7 @@ class UserController extends ApiController
             return $this->errorResponse($validator->messages(), 422);
         }
         
-        $separating_bearer = explode(" ", $headers['Authorization']);
-        $jwt = $separating_bearer[1];
-        
+        $jwt = Token::get_token_from_headers($headers); 
         $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
 
         $user = User::where('username', $decoded->username)->firstOrFail();
@@ -255,8 +257,7 @@ class UserController extends ApiController
         }
 
         $headers = getallheaders();
-        $separating_bearer = explode(" ", $headers['Authorization']);
-        $jwt = $separating_bearer[1];
+        $jwt = Token::get_token_from_headers($headers);
         $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
 
         $follower = User::where('username', $decoded->username)->firstOrFail();
@@ -284,8 +285,7 @@ class UserController extends ApiController
 
         $response = [];
         $headers = getallheaders();
-        $separating_bearer = explode(" ", $headers['Authorization']);
-        $jwt = $separating_bearer[1];
+        $jwt = Token::get_token_from_headers($headers);
         $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
 
         $user = User::where('username', $decoded->username)->firstOrFail();
@@ -315,8 +315,7 @@ class UserController extends ApiController
 
         $response = [];
         $headers = getallheaders();
-        $separating_bearer = explode(" ", $headers['Authorization']);
-        $jwt = $separating_bearer[1];
+        $jwt = Token::get_token_from_headers($headers);
         $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
 
         $user = User::where('username', $decoded->username)->firstOrFail();
@@ -349,9 +348,9 @@ class UserController extends ApiController
         if($validator->fails()){
             return $this->errorResponse($validator->messages(), 422);
         }
+
         $headers = getallheaders();
-        $separating_bearer = explode(" ", $headers['Authorization']);
-        $jwt = $separating_bearer[1];
+        $jwt = Token::get_token_from_headers($headers);
         $decoded = JWT::decode($jwt, env('PRIVATE_KEY'), array("HS256"));
 
         $user = User::where('username', $decoded->username)->firstOrFail();
@@ -363,50 +362,79 @@ class UserController extends ApiController
     }
 
     /**POST
-     * Vender cantidad de cryptos que pesea el usuario en su wallet
+     * Vender cantidad de cryptos que posea el usuario en su wallet
      * Falta hacer que se pueda comprar
      * 
      */
-    public function trade_coins(Request $request){
-        $response =[];
-        $data = $request->getContent();
-        $data = json_decode($data);        
+    public function trade_coin(Request $request){
 
-        if ($data) {
-            $headers = getallheaders();
-            $user = User::where('api_token', $headers['api_token'])->get()->first();
-            $trade = new Trade();
+        $coins_held = [];
+        $headers = getallheaders();
+        $jwt = Token::get_token_from_headers($headers);
+        $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
 
-            if ($user){                
-                for ($i=0; $i < count($user->currency); $i++) { 
+        $user = User::where('username', $decoded->username)->firstOrFail();
+        $currency = Currency::where('name', $request->get('coin'))->firstOrFail();
 
-                    if ($user->currency && $user->currency[$i]->id == $data->coin_id && $user->currency[$i]->pivot->quantity >= $data->quantity) {
+        $wallets = Wallet::where('user_id', $user->id)->get();
 
-                        $wallet = Wallet::where('id', $user->currency[$i]->id)->get()->first();
-                        $wallet->quantity -= $data->quantity;                   
-    
-                        $trade->price = $data->price;
-                        $trade->quantity = $data->quantity;
-                        $trade->user_id = $user->id;
-                        $trade->currency_id = $data->coin_id;
-    
-                        try{
-                            $trade->save();
-                            $wallet->save();
-                            $response = "Trade succesful";
-                        }catch(\Exception $e){
-                            $response = $e->getMessage();
-                        }
-                    }else{
-                        $response = "no";
-                    }
-                }
-                               
-            }else{
-                $response = "No valid user";
-            }
+        foreach ($wallets as $wallet) {
+            $coins_held[] = [
+                'currency_name' => $wallet->currency->name,
+                'id' => $wallet->id
+            ];
         }
-        return response()->json($response);
+
+        if($request->get('is_sell')=='true'){
+            $quantity = -$request->get('quantity');
+            $price = $request->get('quantity');
+            $this->generate_trade($user, $currency, $request, $coins_held, $quantity , $price);
+
+        }else{
+            
+            $quantity = $request->get('quantity');
+            $price = -$request->get('quantity');
+            $this->generate_trade($user, $currency, $request, $coins_held, $quantity , $price);
+
+        }
+
+        return $this->successResponse($user, "Ha funcionado",200);
+
+    }
+
+    public function generate_trade($user, $currency, $request, $coins_held, $quantity, $price){
+
+        $coin_position = array_search($currency->name, array_column($coins_held, 'currency_name'));
+
+        if(!$coin_position){
+
+            $this->initiate_wallet($user->id,$currency->id,$request->get('quantity'));
+            $wallet_dollar = Wallet::find(1);
+            //Esto realmente no deberia ser quantity sino el precio en dollars (need coingecko request)
+            $wallet_dollar->quantity += $price;
+            $wallet_dollar->save();
+            
+        }else{  
+            $wallet_crypto = Wallet::find($coins_held[$coin_position]['id']);
+            $wallet_dollar = Wallet::find(1);
+            $wallet_crypto->quantity += $quantity;
+            //Esto realmente no deberia ser quantity sino el precio en dollars (need coingecko request)
+            $wallet_dollar->quantity += $price;
+            $wallet_crypto->save();
+            $wallet_dollar->save();
+        }
+        $this->initiate_trade($user->id, $currency->id,$request, $request->get('quantity'));
+    }
+
+    public function initiate_trade($user_id, $currency_id, $request, $price){
+        //price es el precio en dollars no quantity
+        Trade::create([
+            'price' => $price,
+            'quantity' => $request->get('quantity'),
+            'is_sell' => false,//$request->get('is_sell'),
+            'user_id' => $user_id,
+            'currency_id' => $currency_id
+        ]);
     }
 
     /**

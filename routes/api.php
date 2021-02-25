@@ -24,7 +24,7 @@ Route::prefix('users')->group(function () {
 	Route::put('/update/exp',[UserController::class, 'update_user_exp'])->middleware('EnsureTokenIsValid');// Done
 
 	Route::put('/update/lvl/{newLvl}',[UserController::class, 'update_lvl'])->middleware('EnsureTokenIsValid');// Done	
-	Route::post('/trade',[UserController::class, 'trade_coins'])->middleware('EnsureTokenIsValid'); // Done
+	Route::post('/trade/coin',[UserController::class, 'trade_coin'])->middleware('EnsureTokenIsValid'); // Done
 	
 	
 	Route::delete('/delete',[UserController::class, 'delete_user'])->middleware('EnsureTokenIsValid');
