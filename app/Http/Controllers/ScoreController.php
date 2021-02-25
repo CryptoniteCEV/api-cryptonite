@@ -17,21 +17,17 @@ class ScoreController extends Controller
      * @return $response List of the scores
      */
     public function score_list()
-    {     
-        $scores = Score::orderBy('experience','DESC')->get(); 
-        if ($scores) {
-            for ($i=0; $i <count($scores) ; $i++) { 
-                $response[$i] = [
-                    "Username" => $scores[$i]->user->username,
-                    "Level" => $scores[$i]->level,
-                    "Experience" => $scores[$i]->experience,
-                    "Profile pic" => $scores[$i]->user->profile_pic
-                ];
-            }        
-        }else{
-            $response = "No scores found";
+    {   
+        $response = [];  
+        $scores = Score::orderBy('experience','DESC')->get();
+
+        foreach ($scores as $score) {
+            $response[] = [
+                'Username' => $score->user->username,
+                'Experience' => $score->experience,
+                'Profile pic' => $score->user->profile_pic
+            ];
         }
         return response()->json($response);
-    }
-    
+    }    
 }

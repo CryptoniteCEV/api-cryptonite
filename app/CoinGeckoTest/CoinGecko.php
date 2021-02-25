@@ -56,6 +56,18 @@ class CoinGecko{
         }
         return $response;
     }
+
+    public static function tradeCoins($coin, $is_sell){
+        $client = new CoinGeckoClient();
+        $coinPrice = self::getPrice($coin['name'],"usd");
+
+        if ($is_sell == 1) {
+            $result = $coinPrice * $coin['quantity'];
+        }else{
+            $result = $coin['quantity'] / $coinPrice;
+        }
+        return $result;
+    }
 }
 
 /** UPDATED VENDORS CLASS

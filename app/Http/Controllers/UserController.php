@@ -44,7 +44,6 @@ class UserController extends ApiController
         if($validator->fails()){
             return $this->errorResponse($validator->messages(), 422);
         }
-        
         $user = User::create([
             'name' => $request->get('name'),
             'password' => Hash::make($request->get('password')),
@@ -54,7 +53,7 @@ class UserController extends ApiController
             'profile_pic' => $request->get('profile_pic'),
             'date_of_birth' => $request->get('date_of_birth')
         ]);
-
+        
         $this->initiate_score($user->id);
 
         return $this->successResponse($user,'User Created', 201);
@@ -80,7 +79,14 @@ class UserController extends ApiController
     public function login(Request $request){
 
         //echo CoinGecko::getPrice("bitcoin","usd");
-        print_r(CoinGecko::getCoins());
+        
+        $coin = [
+            'name' => 'ethereum',
+            'quantity' => 0.7
+        ];
+        echo CoinGecko::tradeCoins($coin, 1);
+        
+        //print_r(CoinGecko::getCoins());
         //print_r(CoinGecko::getHistoryInDays("bitcoin", "usd", 30));
         //print_r(CoinGecko::getPriceAtDay('bitcoin','30-12-2019'));
         
