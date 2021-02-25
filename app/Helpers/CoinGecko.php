@@ -9,11 +9,11 @@ class CoinGecko{
     /**
      * @return the current price for a @param $coin in a specific @param $currency
      */
-    public static function getPrice($coin, $currency){
+    public static function getPrice($coin){
         $client = new CoinGeckoClient();     
         $coin = strtolower($coin);   
-        $data = $client->simple()->getPrice($coin, $currency);
-        return $data[$coin][$currency];
+        $data = $client->simple()->getPrice($coin, "usd");
+        return $data[$coin]["usd"];
     }
 
     /**
@@ -45,9 +45,9 @@ class CoinGecko{
      *   3 - 30 days: 4 hours
      *   31 and before: 4 days
      */
-    public static function getHistoryInDays($coin, $currency, $days){
+    public static function getHistoryInDays($coin, $days){
         $client = new CoinGeckoClient();               
-        $data = $client->coins()->getOHLC($coin, $currency, $days);
+        $data = $client->coins()->getOHLC($coin, "usd", $days);
 
         for ($i=0; $i < count($data) ; $i++) { 
             $response[$i] = [
