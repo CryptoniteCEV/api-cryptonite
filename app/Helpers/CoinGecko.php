@@ -63,12 +63,11 @@ class CoinGecko{
         $coinPrice = self::getPrice($coin, "usd");
 
         if ($is_sell == 1) {
-            $result = $coinPrice * $quantity;
-        }else{
-            $result = $quantity / $coinPrice; 
+            return $coinPrice * $quantity;
         }
 
-        return $result;
+        return $quantity / $coinPrice; 
+        
           
     }
 }
