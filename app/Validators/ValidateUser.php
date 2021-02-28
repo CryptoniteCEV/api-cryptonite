@@ -59,7 +59,7 @@ class ValidateUser{
     public static function validate_trade(){
         return Validator::make(request()->all(), [
             'is_sell' => 'string|required|max:255',
-            'quantity' => 'integer|required',
+            'quantity' => 'required',
             'coin' => 'string|required|max:4'
         ]);
     }
@@ -67,7 +67,7 @@ class ValidateUser{
     public static function validate_wallet(){
         return Validator::make(request()->all(), [
             'user_id' => 'integer|required|max:5',
-            'quantity' => 'integer|required|max:255',
+            'quantity' => 'required',
             'currency_id' => 'integer|required|max:5'
         ]);
     }

@@ -7,7 +7,7 @@ class ValidateWallet{
 
     public static function validate_create(){
         return Validator::make(request()->all(), [
-            'quantity' => 'integer|required'
+            'quantity' => 'float|required'
         ]);
     }
 }

@@ -11,7 +11,10 @@ class wallet extends Model
 
     protected $fillable = ['quantity', 'user_id', 'currency_id'];
 
-    public function currency(){
+    /*public function currency(){
         return $this->belongsToMany(Currency::class);
+    }*/
+    public function currency(){
+        return $this->belongsTo(Currency::class);
     }
 }

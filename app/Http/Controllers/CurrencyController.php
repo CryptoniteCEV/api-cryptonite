@@ -81,4 +81,25 @@ class CurrencyController extends ApiController
 
         return $this->successResponse($response, 201);
     }
+
+    public function get_price(Request $request){
+
+        $currentPrice = CoinGecko::getPrice($request->get('coin'), 'usd');
+
+        return $this->successResponse($currentPrice, 201);
+    }
+
+    public function convert_quantity(Request $request){
+
+        $converted_quantity = CoinGecko::convert_quantity($request->get('coin'), $request->get('quantity') , $request->get('is_sell'));
+
+        return $this->successResponse($converted_quantity, 201);
+    }
+
+    public function get_coin_history(Request $request){
+
+        $coin_history = CoinGecko::getHistoryInDays($request->get('coin'), 'usd' , $request->get('days'));
+
+        return $this->successResponse($coin_history, 201);
+    }
 }
