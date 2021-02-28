@@ -45,4 +45,7 @@ Route::prefix('coins')->group(function () {
 	Route::post('/create',[CurrencyController::class, 'create_currency'])->middleware('EnsureTokenIsValid'); // Done
 	Route::post('/generate/all',[CurrencyController::class, 'generate_currencies']);//->middleware('EnsureTokenIsValid'); // Done
 	Route::get('/list',[CurrencyController::class, 'get_coins'])->middleware('EnsureTokenIsValid'); // Done
+	Route::get('/get/price',[CurrencyController::class, 'get_price'])->middleware('EnsureTokenIsValid'); // Done
+	Route::get('/convert/quantity',[CurrencyController::class, 'convert_quantity'])->middleware('EnsureTokenIsValid');
+	Route::get('/history',[CurrencyController::class, 'get_coin_history'])->middleware('EnsureTokenIsValid');
 });

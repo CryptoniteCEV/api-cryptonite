@@ -58,16 +58,18 @@ class CoinGecko{
         return $response;
     }
 
-    public static function tradeCoins($coin, $is_sell){
+    public static function convert_quantity($coin, $quantity, $is_sell){
         $client = new CoinGeckoClient();
-        $coinPrice = self::getPrice($coin['name'],"usd");
+        $coinPrice = self::getPrice($coin, "usd");
 
         if ($is_sell == 1) {
-            $result = $coinPrice * $coin['quantity'];
+            $result = $coinPrice * $quantity;
         }else{
-            $result = $coin['quantity'] / $coinPrice;
+            $result = $quantity / $coinPrice; 
         }
+
         return $result;
+          
     }
 }
 
