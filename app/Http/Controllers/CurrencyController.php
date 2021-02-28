@@ -70,7 +70,8 @@ class CurrencyController extends ApiController
 
             $response[$i] = [
                 "Name" => $currencies[$i]->name,
-                "Symbol" => $currencies[$i]->symbol
+                "Symbol" => $currencies[$i]->symbol,
+                "Price" => CoinGecko::getPrice($currencies[$i]->name, 'usd')
             ];
             if($currencies[$i]->name == "Dollar"){
                 $response[$i]['Price'] = 1;

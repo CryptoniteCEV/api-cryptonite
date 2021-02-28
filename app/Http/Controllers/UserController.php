@@ -63,7 +63,7 @@ class UserController extends ApiController
 
         InitiateEntry::score($user->id);
         InitiateEntry::wallet($user->id, 1, 1000);
-        return $this->successResponse($user,'User Created', 201);
+        return $this->successResponse($request,'User Created', 201);
     }
 
     /** POST
@@ -132,17 +132,13 @@ class UserController extends ApiController
      */
     public function change_password(Request $request){
 
-        $headers = getallheaders();
-        if(!Token::is_auth_passed()){
-            
-            return $this->errorResponse("Forbidden", 403);
-        }
-        
         $validator = $this->validatePassword();
+
         if ($validator->fails()){
             return $this->errorResponse($validator->messages(), 422);
         }
-        
+
+        $headers = getallheaders();
         $jwt = Token::get_token_from_headers($headers);
         $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));    
             
@@ -165,11 +161,6 @@ class UserController extends ApiController
     public function profile_info(Request $request){
         
         $headers = getallheaders();
-        
-        if(!Token::is_auth_passed()){
-            
-            return $this->errorResponse("Forbidden", 403);
-        }
 
         $jwt = Token::get_token_from_headers($headers);
         $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256")); 
@@ -198,20 +189,14 @@ class UserController extends ApiController
      * @return $response Confirmación de los cambios
      */
     public function update_profile(Request $request){
-
-        $headers = getallheaders();
-        
-        if(!Token::is_auth_passed($headers)){
-            
-            return $this->errorResponse("Forbidden", 403);
-        }
         
         $validator = ValidateUser::validate_uupdate();
 
         if ($validator->fails()){
             return $this->errorResponse($validator->messages(), 422);
         }
-        
+
+        $headers = getallheaders();
         $jwt = Token::get_token_from_headers($headers); 
         $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
 
@@ -454,6 +439,7 @@ class UserController extends ApiController
         
         return $this->successResponse($user_info, 201);
     }
+
 
 }
  
