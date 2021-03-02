@@ -81,6 +81,6 @@ class WalletController extends ApiController
             }
         } 
 
-        return $this->successResponse($info, $cash ,201);
+        return $this->successResponse($info ,201);
     }
 }
