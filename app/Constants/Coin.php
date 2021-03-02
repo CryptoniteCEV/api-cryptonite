@@ -4,8 +4,8 @@ class Coin{
 
     private const CRYPTOS = 
     array(
-        array('name' => 'Dollar',
-            'symbol' => 'USD'), 
+        array('name' => 'Tether',
+            'symbol' => 'USDT'), 
             array('name' => 'Bitcoin',
             'symbol' => 'BTC'),
             array('name' => 'Ethereum',

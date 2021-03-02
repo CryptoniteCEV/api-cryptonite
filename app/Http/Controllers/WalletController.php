@@ -15,6 +15,7 @@ use App\Http\Controllers\ApiController;
 use Illuminate\Support\Facades\Validator;
 
 use \App\Helpers\InitiateEntry;
+use App\Helpers\CoinGecko;
 
 class WalletController extends ApiController
 {
@@ -61,16 +62,25 @@ class WalletController extends ApiController
         $headers = getallheaders();
         $jwt = Token::get_token_from_headers($headers);
         $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
-
+        $cash = 0;
         $user = user::find($decoded->id);
 
         for ($i=0; $i < count($user->wallet); $i++) { 
             $info[$i] = [
                 "Coin" => $user->wallet[$i]->name,
+                "Symbol" => $user->wallet[$i]->symbol,
                 "Quantity" => $user->wallet[$i]->pivot->quantity,
             ];
-        }   
 
-        return $this->successResponse($info, 201);
+            if($user->wallet[$i]->name == "Tether"){
+                $info[$i]['Price'] = $user->wallet[$i]->pivot->quantity;
+                $cash += $user->wallet[$i]->pivot->quantity;
+            }else{
+                $info[$i]['Price'] = CoinGecko::convert_quantity($user->wallet[$i]->name, $user->wallet[$i]->pivot->quantity , 1);
+                $cash += $info[$i]['Price'];
+            }
+        } 
+
+        return $this->successResponse($info, $cash ,201);
     }
 }
