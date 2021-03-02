@@ -48,4 +48,5 @@ Route::prefix('coins')->group(function () {
 	Route::get('/get/price',[CurrencyController::class, 'get_price'])->middleware('EnsureTokenIsValid'); // Done
 	Route::get('/convert/quantity',[CurrencyController::class, 'convert_quantity'])->middleware('EnsureTokenIsValid');
 	Route::get('/history',[CurrencyController::class, 'get_coin_history'])->middleware('EnsureTokenIsValid');
+	Route::get('/quantities',[CurrencyController::class, 'get_coins_with_quantities'])->middleware('EnsureTokenIsValid');
 });

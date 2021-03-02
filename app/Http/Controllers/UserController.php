@@ -63,7 +63,7 @@ class UserController extends ApiController
 
         InitiateEntry::score($user->id);
         InitiateEntry::wallet($user->id, 1, 1000);
-        return $this->successResponse($request,'User Created', 201);
+        return $this->successResponse($user,'User Created', 201);
     }
 
     /** POST

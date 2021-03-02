@@ -14,4 +14,8 @@ class currency extends Model
     public function user(){
     	return $this->belongsToMany(User::class, "trades")->withPivot('quantity','price')->orderBy('created_at', 'desc');
     }
+
+    public function wallet(){
+        return $this->hasOne(Wallet::class);
+    }
 }
