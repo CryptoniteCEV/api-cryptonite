@@ -33,15 +33,23 @@ class WalletController extends ApiController
         $headers = getallheaders();
         $jwt = Token::get_token_from_headers($headers);
         $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
-
-        $validator = ValidateWallet::validate_create();
-
+        
+        /*$validator = ValidateWallet::validate_create();
+        
         if ($validator->fails()){
             return $this->errorResponse($validator->messages(), 422);
+        }*/
+        
+        try{
+            $dollar = currency::where('name', 'tether')->firstOrFail();
+        }catch(\Exception $e){
+            return $this->errorResponse("Coin not found",401);
         }
-
-        $dollar = currency::where('symbol', 'usd')->firstOrFail();
-        $wallet = wallet::where('currency_id', $dollar->id)->where('user_id',$decoded->id)->firstOrFail();
+        try{
+            $wallet = wallet::where('currency_id', $dollar->id)->where('user_id',$decoded->id)->firstOrFail();
+        }catch(\Exception $e){
+            return $this->errorResponse("Wallet not found",401);
+        }
 
         $wallet->quantity += $request->get('quantity');
         $wallet->save();
@@ -63,7 +71,7 @@ class WalletController extends ApiController
         $jwt = Token::get_token_from_headers($headers);
         $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
         $cash = 0;
-        $user = user::find($decoded->id);
+        $user = user::findOrFail($decoded->id);
 
         for ($i=0; $i < count($user->wallet); $i++) { 
             $info[$i] = [

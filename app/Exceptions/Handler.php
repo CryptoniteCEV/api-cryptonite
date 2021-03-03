@@ -54,9 +54,12 @@ class Handler extends ExceptionHandler
 
     public function handleException($request, Exception $exception)
     {
-
         if ($exception instanceof MethodNotAllowedHttpException) {
             return $this->errorResponse('The specified method for the request is invalid', 405);
+        }
+
+        if ($exception instanceof ModelNotFoundException) {
+            return $this->errorResponse($exception->getMessage(), $exception->getStatusCode());
         }
 
         if ($exception instanceof NotFoundHttpException) {
@@ -66,6 +69,7 @@ class Handler extends ExceptionHandler
         if ($exception instanceof HttpException) {
             return $this->errorResponse($exception->getMessage(), $exception->getStatusCode());
         }
+
 
         return $this->errorResponse('Unexpected Exception. Try later', 500);
 
