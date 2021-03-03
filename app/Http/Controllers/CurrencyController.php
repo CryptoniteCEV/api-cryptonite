@@ -97,9 +97,9 @@ class CurrencyController extends ApiController
                 $response[$i]['Quantity'] = $currencies[$i]->wallet->quantity;
 
                 if($currencies[$i]->name == "Tether"){
-                    $response[$i]['Price'] = $response[$i]['Quantity'];
+                    $response[$i]['inDollars'] = $response[$i]['Quantity'];
                 }else{
-                    $response[$i]['Price'] = CoinGecko::convert_quantity($currencies[$i]->name, $currencies[$i]->wallet->quantity, 1);
+                    $response[$i]['inDollars'] = CoinGecko::convert_quantity($currencies[$i]->name, $currencies[$i]->wallet->quantity, 1);
                 }
             }else{
                 $response[$i]['Quantity'] = 0;

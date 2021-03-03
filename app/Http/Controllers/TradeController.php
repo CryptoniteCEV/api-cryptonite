@@ -8,6 +8,8 @@ use App\Models\Trade;
 
 use App\Http\Controllers\ApiController;
 
+use App\Helpers\CoinGecko;
+
 class TradeController extends ApiController
 {
     /**GET
@@ -25,12 +27,21 @@ class TradeController extends ApiController
         
         for ($i=0; $i < count($trades); $i++) { 
             $info[$i] = [
-                "Coin Name" => $trades[$i]->currency->name,
-                "Price" => $trades[$i]->price,
                 "Quantity" => $trades[$i]->quantity,
-                "Is sell" => $trades[$i]->is_sell,
-                "User" => $trades[$i]->user->name
+                "Username" => $trades[$i]->user->username,
+                "Converted" => CoinGecko::convert_quantity($trades[$i]->currency->name, $trades[$i]->quantity, $trades[$i]->is_sell)
             ];
+            if($trades[$i]->is_sell ==1){
+                $info[$i]["Coin_from"] = $trades[$i]->currency->name;
+                $info[$i]["Coin_from_symbol"] = $trades[$i]->currency->symbol;
+                $info[$i]["Coin_to_symbol"] = "$";
+                $info[$i]["Coin_to"] = "Tether";
+            }else{
+                $info[$i]["Coin_to"] = $trades[$i]->currency->name;
+                $info[$i]["Coin_from"] = "Tether";
+                $info[$i]["Coin_to_symbol"] = $trades[$i]->currency->symbol;
+                $info[$i]["Coin_from_symbol"] = "$";
+            }
         }
             
         return $this->successResponse($info, 201);
