@@ -9,7 +9,7 @@ class trade extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['price', 'user_id', 'currency_id', 'quantity', 'is_sell'];
+    protected $fillable = ['price', 'user_id', 'currency_id', 'quantity', 'is_sell', 'date'];
 
     public function currency(){
         return $this->belongsTo(currency::class);

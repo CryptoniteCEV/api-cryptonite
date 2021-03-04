@@ -23,14 +23,15 @@ class InitiateEntry{
         ]);
     }
 
-    public static function trade($user_id, $currency_id, $is_sell, $price, $quantity){
+    public static function trade($user_id, $currency_id, $is_sell, $price, $quantity, $date){
         //price es el precio en dollars no quantity
         return Trade::create([
             'price' => $price,
             'quantity' => $quantity,
             'is_sell' => $is_sell,
             'user_id' => $user_id,
-            'currency_id' => $currency_id
+            'currency_id' => $currency_id,
+            'date' => $date
         ]);
     }
 

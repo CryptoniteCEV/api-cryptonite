@@ -467,7 +467,8 @@ class UserController extends ApiController
                 $this->modify_wallet_quantities($wallet_crypto, $wallet_dollar, $converted_quantity,$quantity,$price);
             }
         }
-        $trade = InitiateEntry::trade($user->id, $currency->id, $is_sell, abs($price), abs($quantity));
+        $date = getDate();
+        $trade = InitiateEntry::trade($user->id, $currency->id, $is_sell, abs($price), abs($quantity), $date[0]);
 
         return $this->successResponse($trade, "Trade successfully created",200);
 
@@ -494,16 +495,18 @@ class UserController extends ApiController
             return $this->errorResponse("User not found",401);
         }
 
-        $user_info = [
-            "username" => $user->username,
-            "name" => $user->name,
-            "profile_pic" => $user->profile_pic,
+        $user_info["User"] = [
+            "Username" => $user->username,
+            "Name" => $user->name,
+            "Profile_pic" => $user->profile_pic
         ];
         
         for ($i=0; $i < count($user->currency); $i++) { 
-            $user_info[$i]["price"] = $user->currency[$i]->pivot->price;
-            $user_info[$i]["quantity"] = $user->currency[$i]->pivot->quantity;
-            $user_info[$i]["currency"] = $user->currency[$i]->name;
+            $user_info["Trades"][$i]["Price"] = $user->currency[$i]->pivot->price;
+            $user_info["Trades"][$i]["Is_sell"] = $user->currency[$i]->pivot->is_sell;
+            $user_info["Trades"][$i]["Quantity"] = $user->currency[$i]->pivot->quantity;
+            $user_info["Trades"][$i]["Coin"] = $user->currency[$i]->name;
+            $user_info["Trades"][$i]["Date"] = $user->currency[$i]->pivot->date;
         }
         
         return $this->successResponse($user_info, 201);

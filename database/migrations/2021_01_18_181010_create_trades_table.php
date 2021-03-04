@@ -20,6 +20,7 @@ class CreateTradesTable extends Migration
             $table->tinyInteger('is_sell');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('currency_id')->constrained();
+            $table->bigInteger('date');
             $table->timestamps();
         });
     }
