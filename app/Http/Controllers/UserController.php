@@ -485,7 +485,7 @@ class UserController extends ApiController
     /**
      * GET info de usuario y sus tradeos
      */
-    public function trades_info(Request $request){
+    public function trades_profile_info(Request $request){
 
         $user_info = [];
         
@@ -494,19 +494,56 @@ class UserController extends ApiController
         }catch(\Exception $e){
             return $this->errorResponse("User not found",401);
         }
-
         $user_info["User"] = [
             "Username" => $user->username,
             "Name" => $user->name,
             "Profile_pic" => $user->profile_pic
         ];
+        for ($i=0; $i < count($user->currency); $i++) { 
+            $user_info["Trades"][$i]["Quantity"] = $user->currency[$i]->pivot->quantity;
+            $user_info["Trades"][$i]["Converted"] = CoinGecko::convert_quantity($user->currency[$i]->name, $user->currency[$i]->pivot->quantity, $user->currency[$i]->pivot->is_sell);
+
+            if($user->currency[$i]->pivot->is_sell == 1){
+                $user_info["Trades"][$i]["Coin_from"] = $user->currency[$i]->name;
+                $user_info["Trades"][$i]["Coin_from_symbol"] = $user->currency[$i]->symbol;
+                $user_info["Trades"][$i]["Coin_to_symbol"] = "$";
+                $user_info["Trades"][$i]["Coin_to"] = "Tether";
+            }else{
+                $user_info["Trades"][$i]["Coin_to"] = $user->currency[$i]->name;
+                $user_info["Trades"][$i]["Coin_from"] = "Tether";
+                $user_info["Trades"][$i]["Coin_to_symbol"] = $user->currency[$i]->symbol;
+                $user_info["Trades"][$i]["Coin_from_symbol"] = "$";
+            }
+        }
+        
+        
+        
+        return $this->successResponse($user_info, 201);
+    }
+
+    /**
+     * GET info de usuario y sus tradeos
+     */
+    public function trades_info(Request $request){
+
+        $user_info = [];
+        
+        $headers = getallheaders();
+        $jwt = Token::get_token_from_headers($headers);
+        $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
+
+        try{
+            $user = User::findOrFail($decoded->id);
+        }catch(\Exception $e){
+            return $this->errorResponse("User not found",401);
+        }
         
         for ($i=0; $i < count($user->currency); $i++) { 
-            $user_info["Trades"][$i]["Price"] = $user->currency[$i]->pivot->price;
-            $user_info["Trades"][$i]["Is_sell"] = $user->currency[$i]->pivot->is_sell;
-            $user_info["Trades"][$i]["Quantity"] = $user->currency[$i]->pivot->quantity;
-            $user_info["Trades"][$i]["Coin"] = $user->currency[$i]->name;
-            $user_info["Trades"][$i]["Date"] = $user->currency[$i]->pivot->date;
+            $user_info[$i]["Price"] = $user->currency[$i]->pivot->price;
+            $user_info[$i]["Is_sell"] = $user->currency[$i]->pivot->is_sell;
+            $user_info[$i]["Quantity"] = $user->currency[$i]->pivot->quantity;
+            $user_info[$i]["Coin"] = $user->currency[$i]->name;
+            $user_info[$i]["Date"] = $user->currency[$i]->pivot->date;
         }
         
         return $this->successResponse($user_info, 201);
