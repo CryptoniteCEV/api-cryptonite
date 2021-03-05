@@ -11,7 +11,9 @@ class Coin{
             array('name' => 'Ethereum',
             'symbol' => 'ETH'),
             array('name' => 'DogeCoin',
-            'symbol' => 'DOGE')
+            'symbol' => 'DOGE'),
+            array('name' => 'Litecoin',
+            'symbol' => 'LTC')
     );
 
     Public function get_all(){

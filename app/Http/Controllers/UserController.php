@@ -62,7 +62,7 @@ class UserController extends ApiController
         $user = InitiateEntry::user($name,$password,$email,$username,$surname,$profile_pic,$date_of_birth);
 
         InitiateEntry::score($user->id);
-        InitiateEntry::wallet($user->id, 1, 1000);
+        InitiateEntry::wallet($user->id);
         return $this->successResponse($user,'User Created', 201);
     }
 
@@ -431,10 +431,10 @@ class UserController extends ApiController
         $converted_quantity = CoinGecko::convert_quantity($currency->name, $quantity, $is_sell);
 
         if($is_sell==1){
-            if(!$coin_position){
+            $wallet_crypto = Wallet::find($coins_held[$coin_position]['id']);
+            if($wallet_crypto->quantity==0){
                 return $this->errorResponse('No funds on this coin',422);
             }else{
-                $wallet_crypto = Wallet::find($coins_held[$coin_position]['id']);
                 if($wallet_crypto->quantity<$quantity){
                     return $this->errorResponse('No funds on this coin',422);
                 }
@@ -456,16 +456,8 @@ class UserController extends ApiController
             if($wallet_dollar->quantity<abs($quantity)){
                 return $this->errorResponse('No funds on this coin',422);
             }
-
-            if(!$coin_position){
-                InitiateEntry::wallet($user->id,$currency->id,$converted_quantity);
-                $wallet_dollar->quantity += $quantity;
-                $wallet_dollar->save();
-                
-            }else{  
                 $wallet_crypto = Wallet::find($coins_held[$coin_position]['id']);
                 $this->modify_wallet_quantities($wallet_crypto, $wallet_dollar, $converted_quantity,$quantity,$price);
-            }
         }
         $date = getDate();
         $trade = InitiateEntry::trade($user->id, $currency->id, $is_sell, abs($price), abs($quantity), $date[0]);

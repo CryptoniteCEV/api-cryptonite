@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Score;
 use App\Models\Trade;
 use App\Models\Wallet;
+use App\Constants\Coin;
 
 class InitiateEntry{
 
@@ -35,12 +36,22 @@ class InitiateEntry{
         ]);
     }
 
-    public static function wallet($user_id, $currency_id, $quantity){
-        Wallet::create([
-            'quantity' => $quantity,
-            'user_id' => $user_id,
-            'currency_id' => $currency_id
-        ]);
+    public static function wallet($user_id){
+        $coin = new Coin();
+        $coins = $coin->get_all();
+        for ($i=1; $i < count($coins); $i++) { 
+            if($i == 1){
+                $quantity = 1000;
+            }else{
+                $quantity = 0;
+            }
+            Wallet::create([
+                'quantity' => $quantity,
+                'user_id' => $user_id,
+                'currency_id' => $i
+            ]);
+        }
+        
     }
 
     public static function score($id){
