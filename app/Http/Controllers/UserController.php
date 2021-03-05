@@ -506,13 +506,13 @@ class UserController extends ApiController
             if($user->currency[$i]->pivot->is_sell == 1){
                 $user_info["Trades"][$i]["Coin_from"] = $user->currency[$i]->name;
                 $user_info["Trades"][$i]["Coin_from_symbol"] = $user->currency[$i]->symbol;
-                $user_info["Trades"][$i]["Coin_to_symbol"] = "$";
+                $user_info["Trades"][$i]["Coin_to_symbol"] = "USDT";
                 $user_info["Trades"][$i]["Coin_to"] = "Tether";
             }else{
                 $user_info["Trades"][$i]["Coin_to"] = $user->currency[$i]->name;
                 $user_info["Trades"][$i]["Coin_from"] = "Tether";
                 $user_info["Trades"][$i]["Coin_to_symbol"] = $user->currency[$i]->symbol;
-                $user_info["Trades"][$i]["Coin_from_symbol"] = "$";
+                $user_info["Trades"][$i]["Coin_from_symbol"] = "USDT";
             }
         }
         
