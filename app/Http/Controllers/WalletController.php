@@ -74,20 +74,21 @@ class WalletController extends ApiController
         $user = user::findOrFail($decoded->id);
 
         for ($i=0; $i < count($user->wallet); $i++) { 
-            $info[$i] = [
-                "Coin" => $user->wallet[$i]->name,
+            $info["Wallets"][$i] = [
+                "Name" => $user->wallet[$i]->name,
                 "Symbol" => $user->wallet[$i]->symbol,
                 "Quantity" => $user->wallet[$i]->pivot->quantity,
             ];
 
             if($user->wallet[$i]->name == "Tether"){
-                $info[$i]['Price'] = $user->wallet[$i]->pivot->quantity;
+                $info["Wallets"][$i]['inDollars'] = $user->wallet[$i]->pivot->quantity;
                 $cash += $user->wallet[$i]->pivot->quantity;
             }else{
-                $info[$i]['Price'] = CoinGecko::convert_quantity($user->wallet[$i]->name, $user->wallet[$i]->pivot->quantity , 1);
-                $cash += $info[$i]['Price'];
+                $info["Wallets"][$i]['inDollars'] = CoinGecko::convert_quantity($user->wallet[$i]->name, $user->wallet[$i]->pivot->quantity , 1);
+                $cash += $info["Wallets"][$i]['inDollars'];
             }
         } 
+        $info["Cash"] = $cash;
 
         return $this->successResponse($info ,201);
     }
