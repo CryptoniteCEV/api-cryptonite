@@ -25,7 +25,9 @@ Route::prefix('users')->group(function () {
 	Route::put('/update/exp',[UserController::class, 'update_user_exp'])->middleware('EnsureTokenIsValid');// Done
 	Route::post('/trade/coin',[UserController::class, 'trade_coin'])->middleware('EnsureTokenIsValid'); // Done
 	Route::get('/trades/info',[UserController::class, 'trades_info'])->middleware('EnsureTokenIsValid');// Done	
-	Route::get('/trades/profile/info',[UserController::class, 'trades_profile_info'])->middleware('EnsureTokenIsValid');// Done	
+	Route::get('/trades/profile/info',[UserController::class, 'trades_profile_info'])->middleware('EnsureTokenIsValid');// Done
+	
+	Route::get('/aws',[UserController::class, 'aws']);
 
 });
 

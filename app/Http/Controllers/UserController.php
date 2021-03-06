@@ -542,6 +542,10 @@ class UserController extends ApiController
         return $this->successResponse($user_info, 201);
     }
 
+    public function aws(){
+        return "Hola desde AWS";
+    }
+
 
 }
  
