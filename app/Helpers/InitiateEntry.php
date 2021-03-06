@@ -39,7 +39,7 @@ class InitiateEntry{
     public static function wallet($user_id){
         $coin = new Coin();
         $coins = $coin->get_all();
-        for ($i=1; $i < count($coins); $i++) { 
+        for ($i=1; $i < count($coins)+1; $i++) { 
             if($i == 1){
                 $quantity = 1000;
             }else{

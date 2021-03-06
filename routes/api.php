@@ -40,6 +40,7 @@ Route::prefix('trades')->group(function () {
 Route::prefix('wallets')->group(function () {
 	Route::put('/deposit',[WalletController::class, 'deposit'])->middleware('EnsureTokenIsValid'); // Done
 	Route::get('/info',[WalletController::class, 'wallet_info'])->middleware('EnsureTokenIsValid'); // Done
+	Route::get('/cash',[WalletController::class, 'get_total_cash'])->middleware('EnsureTokenIsValid'); // Done
 });
 
 Route::prefix('coins')->group(function () {

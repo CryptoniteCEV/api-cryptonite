@@ -92,4 +92,25 @@ class WalletController extends ApiController
 
         return $this->successResponse($info ,201);
     }
+
+    public function get_total_cash(){
+        $info = [];
+        $headers = getallheaders();
+        $jwt = Token::get_token_from_headers($headers);
+        $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
+        $cash = 0;
+        $user = user::findOrFail($decoded->id);
+
+        for ($i=0; $i < count($user->wallet); $i++) { 
+
+            if($user->wallet[$i]->name == "Tether"){
+                $cash += $user->wallet[$i]->pivot->quantity;
+            }else{
+                $converted = CoinGecko::convert_quantity($user->wallet[$i]->name, $user->wallet[$i]->pivot->quantity , 1);
+                $cash += $converted;
+            }
+        } 
+        
+        return $this->successResponse((String)$cash ,201);
+    }
 }

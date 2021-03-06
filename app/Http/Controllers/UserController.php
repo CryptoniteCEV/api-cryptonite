@@ -480,6 +480,7 @@ class UserController extends ApiController
     public function trades_profile_info(Request $request){
 
         $user_info = [];
+        $user_info["Trades"] = [];
         
         try{
             $user = User::where('username', $request->get('username'))->firstOrFail();
