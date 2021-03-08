@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class User extends Model
+class user extends Model
 {
     use HasFactory;
 
@@ -14,15 +14,15 @@ class User extends Model
     
     public function score()
     {
-        return $this->hasOne(Score::class);
+        return $this->hasOne(score::class);
     }
 
     public function currency(){
-        return $this->belongsToMany(Currency::class, "trades")->withPivot('quantity', 'is_sell', 'price', 'date')->orderBy('price','asc');
+        return $this->belongsToMany(currency::class, "trades")->withPivot('quantity', 'is_sell', 'price', 'date')->orderBy('price','asc');
     }
     
     public function wallet(){
-        return $this->belongsToMany(Currency::class, "wallets")->withPivot('quantity');
+        return $this->belongsToMany(currency::class, "wallets")->withPivot('quantity');
     }
     
 }

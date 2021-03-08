@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use App\Models\Trade;
+use App\Models\trade;
 
 use App\Http\Controllers\ApiController;
 
@@ -23,7 +23,7 @@ class TradeController extends ApiController
     public function trade_history()
     {
         $info = [];
-        $trades = Trade::all();
+        $trades = trade::all();
         
         for ($i=0; $i < count($trades); $i++) { 
             $info[$i] = [

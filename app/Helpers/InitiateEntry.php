@@ -13,7 +13,7 @@ class InitiateEntry{
 
     public static function user($name, $password, $email, $username, $surname, $profile_pic, $date_of_birth){
         //price es el precio en dollars no quantity
-        return User::create([
+        return user::create([
             'name' => $name,
             'password' => Hash::make($password),
             'email' => $email,
@@ -26,7 +26,7 @@ class InitiateEntry{
 
     public static function trade($user_id, $currency_id, $is_sell, $price, $quantity, $date){
         //price es el precio en dollars no quantity
-        return Trade::create([
+        return trade::create([
             'price' => $price,
             'quantity' => $quantity,
             'is_sell' => $is_sell,
@@ -45,7 +45,7 @@ class InitiateEntry{
             }else{
                 $quantity = 0;
             }
-            Wallet::create([
+            wallet::create([
                 'quantity' => $quantity,
                 'user_id' => $user_id,
                 'currency_id' => $i
@@ -56,7 +56,7 @@ class InitiateEntry{
 
     public static function score($id){
 
-        $score = Score::create([
+        $score = score::create([
             'user_id' => $id
         ]);
         

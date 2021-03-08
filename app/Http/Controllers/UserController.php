@@ -5,12 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
-use App\Models\User;
-use App\Models\Score;
-use App\Models\Currency;
-use App\Models\Trade;
-use App\Models\Wallet;
-use App\Models\Following;
+use App\Models\user;
+use App\Models\score;
+use App\Models\currency;
+use App\Models\trade;
+use App\Models\wallet;
+use App\Models\following;
 
 use App\Validators\ValidateUser;
 use App\Validators\ValidateCoin;
@@ -30,7 +30,7 @@ class UserController extends ApiController
 
     public function index()
     {
-        $user = User::all();
+        $user = user::all();
         return $this->successResponse($user);
     }
 
@@ -83,7 +83,7 @@ class UserController extends ApiController
         }
         
         try{
-            $user = User::where('username',$request->username)->firstOrFail();
+            $user = user::where('username',$request->username)->firstOrFail();
         }catch(\Exception $e){
             return $this->errorResponse("User not found",401);
         }
@@ -120,7 +120,7 @@ class UserController extends ApiController
         }
 
         try{
-            $user = User::where('email',$request->email)->firstOrFail();
+            $user = user::where('email',$request->email)->firstOrFail();
         }catch(\Exception $e){
             return $this->errorResponse("User not found",401);
         }
@@ -153,7 +153,7 @@ class UserController extends ApiController
         $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));    
             
         try{
-            $user = User::where('username', $decoded->username)->firstOrFail();
+            $user = user::where('username', $decoded->username)->firstOrFail();
         }catch(\Exception $e){
             return $this->errorResponse("User not found",401);
         }
@@ -181,7 +181,7 @@ class UserController extends ApiController
         $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256")); 
 
         try{
-            $user = User::where('username', $decoded->username)->firstOrFail();
+            $user = user::where('username', $decoded->username)->firstOrFail();
         }catch(\Exception $e){
             return $this->errorResponse("User not found",401);
         }
@@ -221,7 +221,7 @@ class UserController extends ApiController
         $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
 
         try{
-            $user = User::where('username', $decoded->username)->firstOrFail();
+            $user = user::where('username', $decoded->username)->firstOrFail();
         }catch(\Exception $e){
             return $this->errorResponse("User not found",401);
         }
@@ -259,14 +259,14 @@ class UserController extends ApiController
         $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
 
         try{
-            $follower = User::where('username', $decoded->username)->firstOrFail();
+            $follower = user::where('username', $decoded->username)->firstOrFail();
         }catch(\Exception $e){
             return $this->errorResponse("User not found",401);
         }
         
-        $following = User::where('username', $request->get('username'))->firstOrFail();
+        $following = user::where('username', $request->get('username'))->firstOrFail();
 
-        Following::create([
+        following::create([
             'following_id' => $following->id,
             'follower_id' => $follower->id
         ]);
@@ -291,15 +291,15 @@ class UserController extends ApiController
         $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
 
         try{
-            $user = User::where('username', $decoded->username)->firstOrFail();
+            $user = user::where('username', $decoded->username)->firstOrFail();
         }catch(\Exception $e){
             return $this->errorResponse("User not found",401);
         }
 
-        $followings_list = Following::where('follower_id', $user->id)->get();
+        $followings_list = following::where('follower_id', $user->id)->get();
         
         for ($i=0; $i < count($followings_list); $i++) { 
-            $user_followed = User::find($followings_list[$i]->following_id);
+            $user_followed = user::find($followings_list[$i]->following_id);
             $response[] = [
                 "username" => $user_followed->username,
                 "profile_pic" => $user_followed->profile_pic
@@ -326,15 +326,15 @@ class UserController extends ApiController
         $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
 
         try{
-            $user = User::where('username', $decoded->username)->firstOrFail();
+            $user = user::where('username', $decoded->username)->firstOrFail();
         }catch(\Exception $e){
             return $this->errorResponse("User not found",401);
         }
 
-        $followers_list = Following::where('following_id', $user->id)->get();
+        $followers_list = following::where('following_id', $user->id)->get();
         
         for ($i=0; $i < count($followers_list); $i++) { 
-            $user_followed = User::find($followers_list[$i]->follower_id);
+            $user_followed = user::find($followers_list[$i]->follower_id);
             $response[] = [
                 "username" => $user_followed->username,
                 "profile_pic" => $user_followed->profile_pic
@@ -366,13 +366,13 @@ class UserController extends ApiController
         $decoded = JWT::decode($jwt, env('PRIVATE_KEY'), array("HS256"));
 
         try{
-            $user = User::where('username', $decoded->username)->firstOrFail();
+            $user = user::where('username', $decoded->username)->firstOrFail();
         }catch(\Exception $e){
             return $this->errorResponse("User not found",401);
         }
 
         try{
-            $score = Score::where('user_id', $user->id)->firstOrFail();
+            $score = score::where('user_id', $user->id)->firstOrFail();
         }catch(\Exception $e){
             return $this->errorResponse("Score not found",401);
         }
@@ -400,18 +400,18 @@ class UserController extends ApiController
         $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
 
         try{
-            $user = User::findOrFail($decoded->id);
+            $user = user::findOrFail($decoded->id);
         }catch(\Exception $e){
             return $this->errorResponse("User not found",401);
         }
 
         try{
-            $currency = Currency::where('symbol', $coin)->firstOrFail();
+            $currency = currency::where('symbol', $coin)->firstOrFail();
         }catch(\Exception $e){
             return $this->errorResponse("Coin not found",401);
         }
     
-        $wallets = Wallet::where('user_id', $user->id)->get();
+        $wallets = wallet::where('user_id', $user->id)->get();
         
         foreach ($wallets as $wallet) {
             $coins_held[] = [
@@ -431,7 +431,7 @@ class UserController extends ApiController
         $converted_quantity = CoinGecko::convert_quantity($currency->name, $quantity, $is_sell);
 
         if($is_sell==1){
-            $wallet_crypto = Wallet::find($coins_held[$coin_position]['id']);
+            $wallet_crypto = wallet::find($coins_held[$coin_position]['id']);
             if($wallet_crypto->quantity==0){
                 return $this->errorResponse('No funds on this coin',422);
             }else{
@@ -440,7 +440,7 @@ class UserController extends ApiController
                 }
                 $quantity = -$quantity;
                 try{
-                    $wallet_dollar = Wallet::where('currency_id','1')->firstOrFail();
+                    $wallet_dollar = wallet::where('currency_id','1')->firstOrFail();
                 }catch(\Exception $e){
                     return $this->errorResponse("Wallet not found",401);
                 }
@@ -449,14 +449,14 @@ class UserController extends ApiController
         }else{
             $quantity = - $quantity;
             try{
-                $wallet_dollar = Wallet::where('currency_id','1')->firstOrFail();
+                $wallet_dollar = wallet::where('currency_id','1')->firstOrFail();
             }catch(\Exception $e){
                 return $this->errorResponse("Wallet not found",401);
             }
             if($wallet_dollar->quantity<abs($quantity)){
                 return $this->errorResponse('No funds on this coin',422);
             }
-                $wallet_crypto = Wallet::find($coins_held[$coin_position]['id']);
+                $wallet_crypto = wallet::find($coins_held[$coin_position]['id']);
                 $this->modify_wallet_quantities($wallet_crypto, $wallet_dollar, $converted_quantity,$quantity,$price);
         }
         $date = getDate();
@@ -483,7 +483,7 @@ class UserController extends ApiController
         $user_info["Trades"] = [];
         
         try{
-            $user = User::where('username', $request->get('username'))->firstOrFail();
+            $user = user::where('username', $request->get('username'))->firstOrFail();
         }catch(\Exception $e){
             return $this->errorResponse("User not found",401);
         }
@@ -526,7 +526,7 @@ class UserController extends ApiController
         $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
 
         try{
-            $user = User::findOrFail($decoded->id);
+            $user = user::findOrFail($decoded->id);
         }catch(\Exception $e){
             return $this->errorResponse("User not found",401);
         }

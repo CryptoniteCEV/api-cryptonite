@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Currency;
+use App\Models\currency;
 use App\Validators\ValidateCoin;
 use App\Constants\Coin;
 use Illuminate\Http\Request;
@@ -23,7 +23,7 @@ class CurrencyController extends ApiController
         $coin = new Coin();
         $cryptos = $coin->get_all();
         foreach ($cryptos as $crypto) {
-            $currencies = Currency::create([
+            $currencies = currency::create([
                 'name' => $crypto['name'],
                 'symbol' => $crypto['symbol']
             ]);
@@ -45,7 +45,7 @@ class CurrencyController extends ApiController
             return $this->errorResponse($validator->messages(), 422);
         }
 
-        $coin = Currency::create([
+        $coin = currency::create([
             'name' => $request->get('name'),
             'symbol' => $request->get('symbol')
         ]);
@@ -64,7 +64,7 @@ class CurrencyController extends ApiController
     public function get_coins(){
 
         $response = [];
-        $currencies = Currency::all();
+        $currencies = currency::all();
         
         for ($i=0; $i < count($currencies); $i++) { 
 
@@ -86,7 +86,7 @@ class CurrencyController extends ApiController
     public function get_coins_with_quantities(){
 
         $response = [];
-        $currencies = Currency::all();
+        $currencies = currency::all();
         
         for ($i=0; $i < count($currencies); $i++) { 
 

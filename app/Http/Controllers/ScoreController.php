@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use App\Models\User;
-use App\Models\Score;
+use App\Models\user;
+use App\Models\score;
 
 use \Firebase\JWT\JWT;
 
@@ -19,7 +19,7 @@ class ScoreController extends Controller
     public function score_list()
     {   
         $response = [];  
-        $scores = Score::orderBy('experience','DESC')->get();
+        $scores = score::orderBy('experience','DESC')->get();
 
         foreach ($scores as $score) {
             $response[] = [
