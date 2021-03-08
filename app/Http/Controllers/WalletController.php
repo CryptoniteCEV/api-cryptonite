@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Models\User;
-use App\Models\currency;
+use App\Models\Currency;
 use App\Models\wallet;
 
 use \Firebase\JWT\JWT;
@@ -41,7 +41,7 @@ class WalletController extends ApiController
         }*/
         
         try{
-            $dollar = currency::where('name', 'tether')->firstOrFail();
+            $dollar = Currency::where('name', 'tether')->firstOrFail();
         }catch(\Exception $e){
             return $this->errorResponse("Coin not found",401);
         }
@@ -71,7 +71,7 @@ class WalletController extends ApiController
         $jwt = Token::get_token_from_headers($headers);
         $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
         $cash = 0;
-        $user = user::findOrFail($decoded->id);
+        $user = User::findOrFail($decoded->id);
 
         for ($i=0; $i < count($user->wallet); $i++) { 
             $info["Wallets"][$i] = [
@@ -99,7 +99,7 @@ class WalletController extends ApiController
         $jwt = Token::get_token_from_headers($headers);
         $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
         $cash = 0;
-        $user = user::findOrFail($decoded->id);
+        $user = User::findOrFail($decoded->id);
 
         for ($i=0; $i < count($user->wallet); $i++) { 
 

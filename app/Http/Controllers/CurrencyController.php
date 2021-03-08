@@ -82,33 +82,6 @@ class CurrencyController extends ApiController
 
         return $this->successResponse($response, 201);
     }
-    /*public function get_coins_with_quantities(){
-
-        $response = [];
-        $currencies = Currency::all();
-        
-        for ($i=0; $i < count($currencies); $i++) { 
-
-            $response[$i] = [
-                "Name" => $currencies[$i]->name,
-                "Symbol" => $currencies[$i]->symbol,
-            ];
-            if($currencies[$i]->wallet){
-                $response[$i]['Quantity'] = $currencies[$i]->wallet->quantity;
-
-                if($currencies[$i]->name == "Tether"){
-                    $response[$i]['inDollars'] = $response[$i]['Quantity'];
-                }else{
-                    $response[$i]['inDollars'] = CoinGecko::convert_quantity($currencies[$i]->name, $currencies[$i]->wallet->quantity, 1);
-                }
-            }else{
-                $response[$i]['Quantity'] = 0;
-                $response[$i]['inDollars'] = 0;
-            }
-        }
-
-        return $this->successResponse($response, 201);
-    }*/
 
     public function get_coins_with_quantities(){
 
