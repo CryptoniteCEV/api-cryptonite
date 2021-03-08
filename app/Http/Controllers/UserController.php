@@ -440,7 +440,7 @@ class UserController extends ApiController
                 }
                 $quantity = -$quantity;
                 try{
-                    $wallet_dollar = wallet::where('currency_id','1')->firstOrFail();
+                    $wallet_dollar = $wallets[0];
                 }catch(\Exception $e){
                     return $this->errorResponse("Wallet not found",401);
                 }
@@ -449,7 +449,7 @@ class UserController extends ApiController
         }else{
             $quantity = - $quantity;
             try{
-                $wallet_dollar = wallet::where('currency_id','1')->firstOrFail();
+                $wallet_dollar = $wallets[0];
             }catch(\Exception $e){
                 return $this->errorResponse("Wallet not found",401);
             }
