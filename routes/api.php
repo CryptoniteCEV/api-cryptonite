@@ -27,7 +27,7 @@ Route::prefix('users')->group(function () {
 	Route::get('/trades/info',[UserController::class, 'trades_info'])->middleware('EnsureTokenIsValid');// Done	
 	Route::get('/trades/profile/info',[UserController::class, 'trades_profile_info'])->middleware('EnsureTokenIsValid');// Done
 	
-	Route::get('/aws',[UserController::class, 'aws']);
+	Route::get('/list',[UserController::class, 'get_users']);//->middleware('EnsureTokenIsValid');
 
 });
 

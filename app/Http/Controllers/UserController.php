@@ -540,8 +540,20 @@ class UserController extends ApiController
         return $this->successResponse($user_info, 201);
     }
 
-    public function aws(){
-        return "Hola desde AWS";
+    public function get_users(){
+        
+        $response = [];
+        $users = user::all();
+        
+        for ($i=0; $i < count($users); $i++) { 
+            $response[$i] = [
+                "Username" => $users[$i]->username,
+                "Exp" => $users[$i]->score->experience,
+                "ProfilePic" => $users[$i]->profile_pic,
+            ];
+        }
+        return $this->successResponse($response, 201);
+        
     }
 
 
