@@ -556,6 +556,23 @@ class UserController extends ApiController
         
     }
 
+    public function user_info(Request $request){
+
+        try{
+            $user = user::findOrFail($request->get('id'));
+        }catch(\Exception $e){
+            return $this->errorResponse("User not found",401);
+        }
+        
+        $response = [
+            "username" => $user->username,
+            "name" => $user->name,
+            "profile_pic" => $user->profile_pic
+        ];
+
+        return $this->successResponse($response);
+    }
+
 
 }
  
