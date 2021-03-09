@@ -20,8 +20,7 @@ class CreateUsersTable extends Migration
             $table->string('username', '25')->unique();
             $table->string('surname', '50');
             $table->string('password');
-            $table->string('profile_pic')->nullable();
-            $table->string('date_of_birth');
+            $table->integer('profile_pic');
             
             $table->timestamps();
         });

@@ -11,7 +11,7 @@ use App\Constants\Coin;
 
 class InitiateEntry{
 
-    public static function user($name, $password, $email, $username, $surname, $profile_pic, $date_of_birth){
+    public static function user($name, $password, $email, $username, $surname, $profile_pic){
         //price es el precio en dollars no quantity
         return user::create([
             'name' => $name,
@@ -19,8 +19,7 @@ class InitiateEntry{
             'email' => $email,
             'username' => $username,
             'surname' => $surname,
-            'profile_pic' => $profile_pic,
-            'date_of_birth' => $date_of_birth
+            'profile_pic' => $profile_pic
         ]);
     }
 

@@ -13,8 +13,7 @@ class ValidateUser{
             'password' => 'required|string|min:6',
             'username' => 'required|string|max:25|unique:users',
             'surname' => 'required|string|max:50',
-            'profile_pic' => 'url|null',
-            'date_of_birth' => 'required|date'
+            'profile_pic' => 'required|integer'
         ]);
     }
 
@@ -40,8 +39,7 @@ class ValidateUser{
         return Validator::make(request()->all(), [
             'name' => 'string|max:30',
             'surname' => 'string|max:50',
-            'profile_pic' => 'url',
-            'date_of_birth' => 'date'
+            'profile_pic' => 'integer'
         ]);
     }
 

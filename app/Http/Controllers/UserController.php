@@ -56,10 +56,9 @@ class UserController extends ApiController
         $password = $request->get('password');
         $email = $request->get('email');
         $surname = $request->get('surname');
-        $date_of_birth = $request->get('date_of_birth');
         $profile_pic = $request->get('profile_pic');
 
-        $user = InitiateEntry::user($name,$password,$email,$username,$surname,$profile_pic,$date_of_birth);
+        $user = InitiateEntry::user($name,$password,$email,$username,$surname,$profile_pic);
 
         InitiateEntry::score($user->id);
         InitiateEntry::wallet($user->id);
@@ -229,7 +228,6 @@ class UserController extends ApiController
         $user->name = $request->has('name') ? $request->get('name') : $user->name;
         $user->surname = $request->has('surname') ? $request->get('surname') : $user->surname;
         $user->profile_pic = $request->has('profile_pic') ? $request->get('profile_pic') : $user->profile_pic;
-        $user->date_of_birth = $request->has('date_of_birth') ? $request->get('date_of_birth') : $user->date_of_birth;
         
         $user->save();
         
