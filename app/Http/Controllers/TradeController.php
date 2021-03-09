@@ -29,6 +29,7 @@ class TradeController extends ApiController
             $info[$i] = [
                 "Quantity" => $trades[$i]->quantity,
                 "Username" => $trades[$i]->user->username,
+                "Profile_pic" => $trades[$i]->user->profile_pic,
                 "Converted" => CoinGecko::convert_quantity($trades[$i]->currency->name, $trades[$i]->quantity, $trades[$i]->is_sell)
             ];
             if($trades[$i]->is_sell ==1){
