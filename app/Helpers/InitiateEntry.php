@@ -3,10 +3,10 @@ namespace App\Helpers;
 
 use Illuminate\Support\Facades\Hash;
 
-use App\Models\User;
-use App\Models\Score;
-use App\Models\Trade;
-use App\Models\Wallet;
+use App\Models\user;
+use App\Models\score;
+use App\Models\trade;
+use App\Models\wallet;
 use App\Constants\Coin;
 
 class InitiateEntry{
