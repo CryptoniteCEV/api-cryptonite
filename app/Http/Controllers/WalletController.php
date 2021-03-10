@@ -113,4 +113,36 @@ class WalletController extends ApiController
         
         return $this->successResponse((String)$cash ,201);
     }
+
+    public function get_percentages(Request $request){
+
+        $info = [];
+        $cash = 0;
+        $user = user::where('username', $request->get('username'))->get()->first();
+        $index = 0;
+        for ($i=0; $i < count($user->wallet); $i++) { 
+            if($user->wallet[$i]->pivot->quantity > 0){
+                $info["Wallets"][$index] = [
+                    "Symbol" => $user->wallet[$i]->symbol
+                ];
+
+                if($user->wallet[$i]->name == "Tether"){
+                    $info["Wallets"][$index]['Percentage'] = $user->wallet[$i]->pivot->quantity;
+                    $cash += $user->wallet[$i]->pivot->quantity;
+                }else{
+                    $info["Wallets"][$index]['Percentage'] = CoinGecko::convert_quantity($user->wallet[$i]->name, $user->wallet[$i]->pivot->quantity , 1);
+                    $cash += $info["Wallets"][$index]['Percentage'];
+                }
+                $index += 1;
+            }
+            
+        } 
+        for ($i=0; $i < count($info["Wallets"]); $i++) { 
+            $percentage = ($info["Wallets"][$i]['Percentage'] * 100) / $cash;
+            $info["Wallets"][$i]['Percentage'] = $percentage;
+        }
+
+        return $this->successResponse($info ,201);
+        
+    }
 }
