@@ -118,6 +118,25 @@ class CurrencyController extends ApiController
         return $this->successResponse($currentPrice, 201);
     }
 
+    public function get_info(Request $request){
+
+        try{
+            $currency = currency::where('name', $request->get('name'))->firstOrFail();
+        }catch(\Exception $e){
+            return $this->errorResponse("Coin not found",401);
+        }
+
+        $currentPrice = CoinGecko::getPrice($currency->name, 'usd');
+
+        $coin = [
+            "Name" => $currency->name,
+            "Symbol" => $currency->symbol,
+            "Price" => $currentPrice
+        ];
+
+        return $this->successResponse($coin, 201);
+    }
+
     public function convert_quantity(Request $request){
 
         $converted_quantity = CoinGecko::convert_quantity($request->get('coin'), $request->get('quantity') , $request->get('is_sell'));
