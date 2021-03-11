@@ -593,8 +593,8 @@ class UserController extends ApiController
         $followings = following::where('follower_id', $follower->id)->where('following_id', $following->id)->firstOrFail();
 
         $followings->delete();
-        
-        return $this->successResponse($followings, 201);
+
+        return $this->successResponse($followings, "You are not following " . $following->username . " anymore"  ,201);
 
     }
 
