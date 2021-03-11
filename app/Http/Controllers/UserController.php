@@ -76,8 +76,6 @@ class UserController extends ApiController
      */
     public function login(Request $request){
 
-        print_r(CoinGecko::getAllCoinInfo("bitcoin"));
-        die;
         $validator = ValidateUser::validate_username();
         if ($validator->fails()){
             return $this->errorResponse($validator->messages(), 422);
