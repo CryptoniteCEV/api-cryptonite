@@ -19,13 +19,23 @@ class CoinGecko{
     public static function getAllCoinInfo($coin){
         $client = new CoinGeckoClient();     
         $coin = strtolower($coin);
-        
+
         $coinInfo['include_market_cap'] = "true";
         $coinInfo['include_24hr_vol'] = "true";
         $coinInfo['include_24hr_change'] = "true";
         
         $data = $client->simple()->getPrice($coin, "usd", $coinInfo);
         return $data[$coin];
+    }
+
+    public static function getMarketChart($coin){
+        $client = new CoinGeckoClient();     
+        $coin = strtolower($coin);
+        
+        $interval['interval'] = "daily";        
+        
+        $data = $client->coins()->getMarketChart($coin, "usd", "30", $interval);
+        return $data['prices'];
     }
 
     /**
