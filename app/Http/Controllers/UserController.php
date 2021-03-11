@@ -573,6 +573,31 @@ class UserController extends ApiController
         return $this->successResponse($response);
     }
 
+    public function stopFollowing(Request $request){
+
+        $headers = getallheaders();
+        $jwt = Token::get_token_from_headers($headers);
+        $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
+
+        try{
+            $follower = user::findOrFail($decoded->id);
+        }catch(\Exception $e){
+            return $this->errorResponse("User not found",401);
+        }
+        try{
+            $following = user::where('username', $request->get('username'))->firstOrFail();
+        }catch(\Exception $e){
+            return $this->errorResponse("User not found",401);
+        }
+
+        $followings = following::where('follower_id', $follower->id)->where('following_id', $following->id)->firstOrFail();
+
+        $followings->delete();
+        
+        return $this->successResponse($followings, 201);
+
+    }
+
     
 
 

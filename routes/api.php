@@ -26,9 +26,9 @@ Route::prefix('users')->group(function () {
 	Route::post('/trade/coin',[UserController::class, 'trade_coin'])->middleware('EnsureTokenIsValid'); // Done
 	Route::get('/trades/info',[UserController::class, 'trades_info'])->middleware('EnsureTokenIsValid');// Done	
 	Route::get('/trades/profile/info',[UserController::class, 'trades_profile_info'])->middleware('EnsureTokenIsValid');// Done
-	Route::get('/info',[UserController::class, 'user_info']);
-	Route::get('/list',[UserController::class, 'get_users']);//->middleware('EnsureTokenIsValid');
-
+	Route::get('/info',[UserController::class, 'user_info'])->middleware('EnsureTokenIsValid');
+	Route::get('/list',[UserController::class, 'get_users'])->middleware('EnsureTokenIsValid');
+	Route::delete('/stop/following',[UserController::class, 'stopFollowing'])->middleware('EnsureTokenIsValid');;
 });
 
 Route::prefix('scores')->group(function () {
@@ -43,7 +43,7 @@ Route::prefix('wallets')->group(function () {
 	Route::put('/deposit',[WalletController::class, 'deposit'])->middleware('EnsureTokenIsValid'); // Done
 	Route::get('/info',[WalletController::class, 'wallet_info'])->middleware('EnsureTokenIsValid'); // Done
 	Route::get('/cash',[WalletController::class, 'get_total_cash'])->middleware('EnsureTokenIsValid'); // Done
-	Route::get('/percentages',[WalletController::class, 'get_percentages']);//->middleware('EnsureTokenIsValid'); // Done
+	Route::get('/percentages',[WalletController::class, 'get_percentages'])->middleware('EnsureTokenIsValid'); // Done
 });
 
 Route::prefix('coins')->group(function () {
@@ -54,5 +54,7 @@ Route::prefix('coins')->group(function () {
 	Route::get('/convert/quantity',[CurrencyController::class, 'convert_quantity'])->middleware('EnsureTokenIsValid');
 	Route::get('/history',[CurrencyController::class, 'get_coin_history'])->middleware('EnsureTokenIsValid');
 	Route::get('/quantities',[CurrencyController::class, 'get_coins_with_quantities'])->middleware('EnsureTokenIsValid');
-	Route::get('/info',[CurrencyController::class, 'get_info']);
+	Route::get('/info',[CurrencyController::class, 'get_info'])->middleware('EnsureTokenIsValid');
 });
+
+
