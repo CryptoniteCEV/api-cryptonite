@@ -76,7 +76,7 @@ class CurrencyController extends ApiController
                 "Price" => $coinInfo['usd'],
                 "Change" => $coinInfo['usd_24h_change']
             ];
-            
+
             if($currencies[$i]->name == "Tether"){
                 $response[$i]['Price'] = 1;
             }else{
@@ -153,7 +153,7 @@ class CurrencyController extends ApiController
 
     public function get_coin_history(Request $request){
 
-        $coin_history = CoinGecko::getHistoryInDays($request->get('coin'), 'usd' , $request->get('days'));
+        $coin_history = CoinGecko::getMarketChart($request->get('coin'));
 
         return $this->successResponse($coin_history, 201);
     }
