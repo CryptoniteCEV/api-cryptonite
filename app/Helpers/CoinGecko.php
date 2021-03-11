@@ -16,6 +16,18 @@ class CoinGecko{
         return $data[$coin]["usd"];
     }
 
+    public static function getAllCoinInfo($coin){
+        $client = new CoinGeckoClient();     
+        $coin = strtolower($coin);
+        
+        $coinInfo['include_market_cap'] = "true";
+        $coinInfo['include_24hr_vol'] = "true";
+        $coinInfo['include_24hr_change'] = "true";
+        
+        $data = $client->simple()->getPrice($coin, "usd", $coinInfo);
+        return $data[$coin];
+    }
+
     /**
      * @return all coins form CoinGeckoAPI
      */
