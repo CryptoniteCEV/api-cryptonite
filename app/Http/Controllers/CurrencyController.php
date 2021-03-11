@@ -68,11 +68,15 @@ class CurrencyController extends ApiController
         
         for ($i=0; $i < count($currencies); $i++) { 
 
+            $coinInfo = CoinGecko::getAllCoinInfo($currencies[$i]->name);
+
             $response[$i] = [
                 "Name" => $currencies[$i]->name,
                 "Symbol" => $currencies[$i]->symbol,
-                "Price" => CoinGecko::getPrice($currencies[$i]->name, 'usd')
+                "Price" => $coinInfo['usd'],
+                "Change" => $coinInfo['usd_24h_change']
             ];
+            
             if($currencies[$i]->name == "Tether"){
                 $response[$i]['Price'] = 1;
             }else{
@@ -126,12 +130,15 @@ class CurrencyController extends ApiController
             return $this->errorResponse("Coin not found",401);
         }
 
-        $currentPrice = CoinGecko::getPrice($currency->name, 'usd');
-
+        $coinInfo = CoinGecko::getAllCoinInfo($currency->name);
+        
         $coin = [
             "Name" => $currency->name,
             "Symbol" => $currency->symbol,
-            "Price" => $currentPrice
+            "Price" => $coinInfo['usd'],
+            "Change" => $coinInfo['usd_24h_change'],
+            "Volume" => $coinInfo['usd_24h_vol'],
+            "Cap" => $coinInfo['usd_market_cap']
         ];
 
         return $this->successResponse($coin, 201);
