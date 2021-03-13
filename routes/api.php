@@ -32,7 +32,7 @@ Route::prefix('users')->group(function () {
 	Route::delete('/stop/following',[UserController::class, 'stopFollowing'])->middleware('EnsureTokenIsValid');
 	Route::post('/assign/mission',[UserController::class, 'assignNewRandMission'])->middleware('EnsureTokenIsValid');
 	Route::post('/update/mission',[UserController::class, 'updateMission'])->middleware('EnsureTokenIsValid');
-	Route::get('/missions/list',[UserController::class, 'getUserMission'])->middleware('EnsureTokenIsValid');
+	Route::get('/gamification',[UserController::class, 'getUserGamification'])->middleware('EnsureTokenIsValid');
 	
 });
 

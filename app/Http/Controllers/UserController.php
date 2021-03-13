@@ -380,6 +380,22 @@ class UserController extends ApiController
         return $this->successResponse($score,"Exp. updated", 201);
     }
 
+    public function getUserExperience(){
+
+        $headers = getallheaders();
+        $jwt = Token::get_token_from_headers($headers);
+        $decoded = JWT::decode($jwt, env('PRIVATE_KEY'), array("HS256"));
+
+        try{
+            $user = user::where('username', $decoded->username)->firstOrFail();
+        }catch(\Exception $e){
+            return $this->errorResponse("User not found",401);
+        }
+
+        return $user->score->experience;
+
+    }
+
     /**POST
      * Vender cantidad de cryptos que posea el usuario en su wallet
      * Falta hacer que se pueda comprar
@@ -685,8 +701,9 @@ class UserController extends ApiController
         
     }
 
-    public function getUserMission(){
+    public function getUserGamification(){
 
+        $gamification = [];
         $headers = getallheaders();
         $jwt = Token::get_token_from_headers($headers);
         $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
@@ -699,9 +716,15 @@ class UserController extends ApiController
 
         $userMissions = $user->mission;
 
+        $gamification["User"] = [
+            "Username" => $user->username,
+            "Exp" => $user->score->experience,
+            "ProfilePic" => $user->profile_pic
+        ];
+
         for ($i=0; $i <count($userMissions) ; $i++) { 
             
-            $all_missions[$i] = [
+            $gamification["Missions"][$i] = [
                 "id" => $userMissions[$i]->id,
                 "is_finished" => $userMissions[$i]->pivot->is_finished,
                 "icon" => $userMissions[$i]->icon,
@@ -709,7 +732,7 @@ class UserController extends ApiController
             ];
         }
 
-        return $this->successResponse($all_missions ,200);
+        return $this->successResponse($gamification ,200);
     }
 
     
