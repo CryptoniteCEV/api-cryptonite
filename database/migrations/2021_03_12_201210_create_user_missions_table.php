@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTradesTable extends Migration
+class CreateUserMissionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,11 @@ class CreateTradesTable extends Migration
      */
     public function up()
     {
-        Schema::create('trades', function (Blueprint $table) {
+        Schema::create('user_missions', function (Blueprint $table) {
             $table->id();
-            $table->integer('price');
-            $table->integer('quantity');
-            $table->tinyInteger('is_sell');
             $table->foreignId('user_id')->constrained();
-            $table->foreignId('currency_id')->constrained();
-            $table->bigInteger('date');
+            $table->foreignId('mission_id')->constrained();
+            $table->tinyInteger('is_finished');
             $table->timestamps();
         });
     }
@@ -32,6 +29,6 @@ class CreateTradesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('trades');
+        Schema::dropIfExists('user_missions');
     }
 }

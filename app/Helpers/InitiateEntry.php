@@ -7,18 +7,18 @@ use App\Models\user;
 use App\Models\score;
 use App\Models\trade;
 use App\Models\wallet;
+use App\Models\userMission;
 use App\Constants\Coin;
 
 class InitiateEntry{
 
-    public static function user($name, $password, $email, $username, $surname, $profile_pic){
+    public static function user($name, $password, $email, $username, $profile_pic){
         //price es el precio en dollars no quantity
         return user::create([
             'name' => $name,
             'password' => Hash::make($password),
             'email' => $email,
             'username' => $username,
-            'surname' => $surname,
             'profile_pic' => $profile_pic
         ]);
     }
@@ -59,5 +59,18 @@ class InitiateEntry{
             'user_id' => $id
         ]);
         
+    }
+
+    public static function missions($id){
+        $missions_ids = [13, 12, 3];
+
+        for ($i=0; $i < count($missions_ids) ; $i++) { 
+            
+            $mission = UserMission::create([
+                'user_id' => $id,
+                'mission_id' => $missions_ids[$i],
+                'is_finished' => 0
+            ]);
+        }
     }
 }

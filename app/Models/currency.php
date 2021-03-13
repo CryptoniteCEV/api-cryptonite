@@ -12,7 +12,7 @@ class currency extends Model
     protected $fillable = ['name', 'symbol'];
 
     public function user(){
-    	return $this->belongsToMany(user::class, "trades")->withPivot('quantity','price')->orderBy('created_at', 'desc');
+    	return $this->belongsToMany(user::class, "trades")->withPivot('quantity','price')->orderBy('created_at', 'asc');
     }
 
     public function wallet(){

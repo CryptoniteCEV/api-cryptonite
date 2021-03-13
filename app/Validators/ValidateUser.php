@@ -11,8 +11,7 @@ class ValidateUser{
             'name' => 'required|string|max:30',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6',
-            'username' => 'required|string|max:25|unique:users',
-            'surname' => 'required|string|max:50',
+            'username' => 'required|string|max:8|unique:users',
             'profile_pic' => 'required|integer'
         ]);
     }
@@ -38,7 +37,6 @@ class ValidateUser{
     public static function validate_update(){
         return Validator::make(request()->all(), [
             'name' => 'string|max:30',
-            'surname' => 'string|max:50',
             'profile_pic' => 'integer'
         ]);
     }

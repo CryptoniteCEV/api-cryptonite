@@ -15,8 +15,6 @@ class CurrencyController extends ApiController
     /**POST
      * Registra todas las cryptos creadas previamente a la vez.
      *
-     * Recibe nombre de la moneda a través de body para introducirla en la database
-     *
      * @return $response Confirmación
      */
     public function generate_currencies(){

@@ -11,6 +11,8 @@ use App\Models\currency;
 use App\Models\trade;
 use App\Models\wallet;
 use App\Models\following;
+use App\Models\userMission;
+use App\Models\mission;
 
 use App\Validators\ValidateUser;
 use App\Validators\ValidateCoin;
@@ -55,13 +57,13 @@ class UserController extends ApiController
         $name = $request->get('name');
         $password = $request->get('password');
         $email = $request->get('email');
-        $surname = $request->get('surname');
         $profile_pic = $request->get('profile_pic');
 
-        $user = InitiateEntry::user($name,$password,$email,$username,$surname,$profile_pic);
+        $user = InitiateEntry::user($name,$password,$email,$username,$profile_pic);
 
         InitiateEntry::score($user->id);
         InitiateEntry::wallet($user->id);
+        InitiateEntry::missions($user->id);
         return $this->successResponse($user,'User Created', 201);
     }
 
@@ -189,7 +191,6 @@ class UserController extends ApiController
         $response = [
             "username" => $user->username,
             "name" => $user->name,
-            "surname" => $user->surname,
             "email" => $user->email,
             "profile_pic" => $user->profile_pic
         ];
@@ -226,7 +227,6 @@ class UserController extends ApiController
         }
 
         $user->name = $request->has('name') ? $request->get('name') : $user->name;
-        $user->surname = $request->has('surname') ? $request->get('surname') : $user->surname;
         $user->profile_pic = $request->has('profile_pic') ? $request->get('profile_pic') : $user->profile_pic;
         
         $user->save();
@@ -598,8 +598,120 @@ class UserController extends ApiController
 
     }
 
+    public function assignNewRandMission(Request $request){
+
+        $headers = getallheaders();
+        $jwt = Token::get_token_from_headers($headers);
+        $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
+
+        try{
+            $user = user::findOrFail($decoded->id);
+        }catch(\Exception $e){
+            return $this->errorResponse("User not found",401);
+        }
+        //delete
+        userMission::where('user_id', $decoded->id)->where('mission_id', $request->get('id'))->firstOrFail()->delete();
+        
+        //getAllMissions
+        $missions = mission::all();
+
+        //getUserMissions
+        $userMissions = $user->mission;
+        $user_missions_id = [];
+        
+        foreach ($userMissions as $userMission) {
+            $user_missions_id[] = $userMission->id;
+        }
+
+        do {
+            //generateRandom
+            $new_mission_id = rand(1, count($missions));
+            
+        }while(in_array($new_mission_id , $user_missions_id) || $new_mission_id==$request->get('id'));
+        
+
+        $new_user_mission = userMission::create([
+            'user_id' => $decoded->id,
+            'mission_id' => $new_mission_id,
+            'is_finished' => 0
+        ]);
+
+        $all_missions = [];
+
+        $all_missions[0]["id"] = $new_user_mission->mission->id;
+        $all_missions[0]["is_finished"] = $new_user_mission->is_finished;
+        $all_missions[0]["icon"] = $new_user_mission->mission->icon;
+        $all_missions[0]["description"] = $new_user_mission->mission->description;
+
+        
+        for ($i=0; $i <count($userMissions) ; $i++) { 
+            
+            $all_missions[$i + 1]["id"] = $userMissions[$i]->id;
+            $all_missions[$i + 1]["is_finished"] = $userMissions[$i]->pivot->is_finished;
+            $all_missions[$i + 1]["icon"] = $userMissions[$i]->icon;
+            $all_missions[$i + 1]["description"] = $userMissions[$i]->description;
+        }
+
+        return $this->successResponse($all_missions, "Mission deleted, new mission assigned" ,201);
+    }
+
+    public function updateMission(Request $request){
+
+        $headers = getallheaders();
+        $jwt = Token::get_token_from_headers($headers);
+        $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
+
+        try{
+            $user = user::findOrFail($decoded->id);
+        }catch(\Exception $e){
+            return $this->errorResponse("User not found",401);
+        }
+
+        $userMissions = $user->mission;
+        $user_missions_id = [];
+        
+        foreach ($userMissions as $userMission) {
+            $user_missions_id[] = $userMission->id;
+        }
+        
+        if($id = in_array($request->get('id') , $user_missions_id)){
+            $user_mission = userMission::where('mission_id', $user_missions_id[$id])->firstOrFail();
+            $user_mission->is_finished = 1;
+            $user_mission->save();
+            return $this->successResponse($user_mission, "Mission Ready To Be Claimed" ,200);
+        }
+            
+        return $this->errorResponse("Mission not active" , 300);;
+        
+    }
+
+    public function getUserMission(){
+
+        $headers = getallheaders();
+        $jwt = Token::get_token_from_headers($headers);
+        $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
+
+        try{
+            $user = user::findOrFail($decoded->id);
+        }catch(\Exception $e){
+            return $this->errorResponse("User not found",401);
+        }
+
+        $userMissions = $user->mission;
+
+        for ($i=0; $i <count($userMissions) ; $i++) { 
+            
+            $all_missions[$i] = [
+                "id" => $userMissions[$i]->id,
+                "is_finished" => $userMissions[$i]->pivot->is_finished,
+                "icon" => $userMissions[$i]->icon,
+                "description" => $userMissions[$i]->description
+            ];
+        }
+
+        return $this->successResponse($all_missions ,200);
+    }
+
     
-
-
 }
  

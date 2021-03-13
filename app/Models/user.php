@@ -9,7 +9,7 @@ class user extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['email', 'name','username','surname','profile_pic','password','date_of_birth'];
+    protected $fillable = ['email', 'name','username','profile_pic','password','date_of_birth'];
     protected $hidden = ['password','updated_at','created_at'];
     
     public function score()
@@ -25,4 +25,8 @@ class user extends Model
         return $this->belongsToMany(currency::class, "wallets")->withPivot('quantity');
     }
     
+    public function mission(){
+    	return $this->belongsToMany(mission::class, "user_missions")->withPivot('is_finished', 'user_id', 'mission_id');
+    }
+
 }

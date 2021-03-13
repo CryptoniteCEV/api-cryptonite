@@ -8,6 +8,7 @@ use App\Http\Controllers\WalletController;
 use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\TradeController;
 use App\Http\Controllers\ScoreController;
+use App\Http\Controllers\MissionController;
 
 
 Route::prefix('users')->group(function () {
@@ -28,7 +29,11 @@ Route::prefix('users')->group(function () {
 	Route::get('/trades/profile/info',[UserController::class, 'trades_profile_info'])->middleware('EnsureTokenIsValid');// Done
 	Route::get('/info',[UserController::class, 'user_info'])->middleware('EnsureTokenIsValid');
 	Route::get('/list',[UserController::class, 'get_users'])->middleware('EnsureTokenIsValid');
-	Route::delete('/stop/following',[UserController::class, 'stopFollowing'])->middleware('EnsureTokenIsValid');;
+	Route::delete('/stop/following',[UserController::class, 'stopFollowing'])->middleware('EnsureTokenIsValid');
+	Route::post('/assign/mission',[UserController::class, 'assignNewRandMission'])->middleware('EnsureTokenIsValid');
+	Route::post('/update/mission',[UserController::class, 'updateMission'])->middleware('EnsureTokenIsValid');
+	Route::get('/missions/list',[UserController::class, 'getUserMission'])->middleware('EnsureTokenIsValid');
+	
 });
 
 Route::prefix('scores')->group(function () {
@@ -48,13 +53,17 @@ Route::prefix('wallets')->group(function () {
 
 Route::prefix('coins')->group(function () {
 	Route::post('/create',[CurrencyController::class, 'create_currency'])->middleware('EnsureTokenIsValid'); // Done
-	Route::post('/generate/all',[CurrencyController::class, 'generate_currencies']);//->middleware('EnsureTokenIsValid'); // Done
+	Route::post('/generate/all',[CurrencyController::class, 'generate_currencies']); // Done
 	Route::get('/list',[CurrencyController::class, 'get_coins'])->middleware('EnsureTokenIsValid'); // Done
 	Route::get('/get/price',[CurrencyController::class, 'get_price'])->middleware('EnsureTokenIsValid'); // Done
 	Route::get('/convert/quantity',[CurrencyController::class, 'convert_quantity'])->middleware('EnsureTokenIsValid');
 	Route::get('/history',[CurrencyController::class, 'get_coin_history'])->middleware('EnsureTokenIsValid');
 	Route::get('/quantities',[CurrencyController::class, 'get_coins_with_quantities'])->middleware('EnsureTokenIsValid');
 	Route::get('/info',[CurrencyController::class, 'get_info'])->middleware('EnsureTokenIsValid');
+});
+
+Route::prefix('missions')->group(function () {
+	Route::post('/generate/all',[MissionController::class, 'generate_missions']); // Done
 });
 
 
