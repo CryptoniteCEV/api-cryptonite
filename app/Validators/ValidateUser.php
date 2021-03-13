@@ -49,7 +49,7 @@ class ValidateUser{
 
     public static function validate_exp(){
         return Validator::make(request()->all(), [
-            'new_exp' => 'integer|required|max:255'
+            'new_exp' => 'integer|required'
         ]);
     }
     public static function validate_trade(){
