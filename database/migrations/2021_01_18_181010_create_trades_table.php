@@ -15,8 +15,8 @@ class CreateTradesTable extends Migration
     {
         Schema::create('trades', function (Blueprint $table) {
             $table->id();
-            $table->integer('price');
-            $table->integer('quantity');
+            $table->double('price');
+            $table->double('quantity');
             $table->tinyInteger('is_sell');
             $table->foreignId('user_id')->constrained();
             $table->foreignId('currency_id')->constrained();

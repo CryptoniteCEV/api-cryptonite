@@ -441,11 +441,16 @@ class UserController extends ApiController
         }
 
         $coin_position = array_search($currency->name, array_column($coins_held, 'currency_name'));
-        $price = CoinGecko::getPrice($currency->name, 'usd');
         $converted_quantity = CoinGecko::convert_quantity($currency->name, $quantity, $is_sell);
-
+        
+        $price = CoinGecko::getPrice($currency->name, 'usd');
+            
+        $date = getDate();
+        
         if($is_sell==1){
+            
             $wallet_crypto = wallet::find($coins_held[$coin_position]['id']);
+            
             if($wallet_crypto->quantity==0){
                 return $this->errorResponse('No funds on this coin',422);
             }else{
@@ -453,12 +458,13 @@ class UserController extends ApiController
                     return $this->errorResponse('No funds on this coin',422);
                 }
                 $quantity = -$quantity;
+                
                 try{
                     $wallet_dollar = $wallets[0];
                 }catch(\Exception $e){
                     return $this->errorResponse("Wallet not found",401);
                 }
-                $this->modify_wallet_quantities($wallet_crypto, $wallet_dollar, $quantity, $converted_quantity, $price);
+                $this->modify_wallet_quantities($wallet_crypto, $wallet_dollar, $quantity, $converted_quantity);
             }
         }else{
             $quantity = - $quantity;
@@ -471,16 +477,23 @@ class UserController extends ApiController
                 return $this->errorResponse('No funds on this coin',422);
             }
                 $wallet_crypto = wallet::find($coins_held[$coin_position]['id']);
-                $this->modify_wallet_quantities($wallet_crypto, $wallet_dollar, $converted_quantity,$quantity,$price);
+                $this->modify_wallet_quantities($wallet_crypto, $wallet_dollar, $converted_quantity,$quantity);
         }
-        $date = getDate();
-        $trade = InitiateEntry::trade($user->id, $currency->id, $is_sell, abs($price), abs($quantity), $date[0]);
+        $trade = new trade();
+        $trade->price = $price;
+        $trade->quantity = abs($quantity);
+        $trade->is_sell = $is_sell;
+        $trade->user_id = $user->id;
+        $trade->currency_id = $currency->id;
+        $trade->date = $date[0];
 
+        InitiateEntry::trade($user->id, $currency->id, $is_sell, $price, abs($quantity), $date[0]);
+            
         return $this->successResponse($trade, "Trade successfully created",200);
 
     }
 
-    public function modify_wallet_quantities($wallet_crypto, $wallet_dollar, $quantity_crypto, $quantity_dollar, $price){
+    public function modify_wallet_quantities($wallet_crypto, $wallet_dollar, $quantity_crypto, $quantity_dollar){
 
         $wallet_crypto->quantity += $quantity_crypto;
         $wallet_dollar->quantity += $quantity_dollar;
@@ -506,9 +519,10 @@ class UserController extends ApiController
             "Name" => $user->name,
             "Profile_pic" => $user->profile_pic
         ];
+        
         for ($i=0; $i < count($user->currency); $i++) { 
             $user_info["Trades"][$i]["Quantity"] = $user->currency[$i]->pivot->quantity;
-            $user_info["Trades"][$i]["Converted"] = CoinGecko::convert_quantity($user->currency[$i]->name, $user->currency[$i]->pivot->quantity, $user->currency[$i]->pivot->is_sell);
+            $user_info["Trades"][$i]["Converted"] = $user->currency[$i]->pivot->quantity * $user->currency[$i]->pivot->price;
 
             if($user->currency[$i]->pivot->is_sell == 1){
                 $user_info["Trades"][$i]["Coin_from"] = $user->currency[$i]->name;

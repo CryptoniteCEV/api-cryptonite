@@ -25,13 +25,13 @@ class TradeController extends ApiController
         $info = [];
        
         $trades = trade::orderBy('created_at', 'desc')->get();
-        
+
         for ($i=0; $i < count($trades); $i++) { 
             $info[$i] = [
                 "Quantity" => $trades[$i]->quantity,
                 "Username" => $trades[$i]->user->username,
                 "Profile_pic" => $trades[$i]->user->profile_pic,
-                "Converted" => CoinGecko::convert_quantity($trades[$i]->currency->name, $trades[$i]->quantity, $trades[$i]->is_sell)
+                "Converted" => $trades[$i]->quantity * $trades[$i]->price,
             ];
             if($trades[$i]->is_sell ==1){
                 $info[$i]["Coin_from"] = $trades[$i]->currency->name;
