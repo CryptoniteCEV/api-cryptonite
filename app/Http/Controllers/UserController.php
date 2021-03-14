@@ -643,7 +643,7 @@ class UserController extends ApiController
             //generateRandom
             $new_mission_id = rand(1, count($missions));
             
-        }while(in_array($new_mission_id , $user_missions_id) || $new_mission_id==$request->get('id'));
+        }while(in_array($new_mission_id , $user_missions_id) || $new_mission_id==$request->get('id') || $new_mission_id == 11 || $new_mission_id == 13);
         
 
         $new_user_mission = userMission::create([

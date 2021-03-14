@@ -62,7 +62,7 @@ class InitiateEntry{
     }
 
     public static function missions($id){
-        $missions_ids = [13, 12, 3];
+        $missions_ids = [13, 11, 3];
 
         for ($i=0; $i < count($missions_ids) ; $i++) { 
             
