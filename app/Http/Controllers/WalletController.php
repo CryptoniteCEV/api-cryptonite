@@ -120,6 +120,8 @@ class WalletController extends ApiController
         $cash = 0;
         $user = user::where('username', $request->get('username'))->get()->first();
         $index = 0;
+        $wallets = [];
+
         for ($i=0; $i < count($user->wallet); $i++) { 
             if($user->wallet[$i]->pivot->quantity > 0){
                 $info["Wallets"][$index] = [
@@ -137,12 +139,23 @@ class WalletController extends ApiController
             }
             
         } 
+        
         for ($i=0; $i < count($info["Wallets"]); $i++) { 
             $percentage = ($info["Wallets"][$i]['Percentage'] * 100) / $cash;
             $info["Wallets"][$i]['Percentage'] = $percentage;
         }
 
-        return $this->successResponse($info ,201);
+        $index = 0;
+
+        for ($i=0; $i < count($info["Wallets"]); $i++) { 
+            if($info["Wallets"][$index]['Percentage'] > 2){
+                $wallets["Wallets"][$index]['Symbol'] = $info["Wallets"][$index]['Symbol'];
+                $wallets["Wallets"][$index]['Percentage'] = $info["Wallets"][$index]['Percentage'];
+                $index += 1;
+            }
+        }
+
+        return $this->successResponse($wallets ,201);
         
     }
 }
