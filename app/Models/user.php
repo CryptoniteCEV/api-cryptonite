@@ -18,7 +18,7 @@ class user extends Model
     }
 
     public function currency(){
-        return $this->belongsToMany(currency::class, "trades")->withPivot('quantity', 'is_sell', 'price', 'date')->orderBy('price','asc');
+        return $this->belongsToMany(currency::class, "trades")->withPivot('quantity', 'is_sell', 'price', 'date');
     }
     
     public function wallet(){

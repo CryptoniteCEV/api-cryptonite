@@ -522,7 +522,8 @@ class UserController extends ApiController
         
         for ($i=0; $i < count($user->currency); $i++) { 
             $user_info["Trades"][$i]["Quantity"] = $user->currency[$i]->pivot->quantity;
-            if($user->currency[$i]->pivot->is_sell == 0){
+
+            if($user->currency[$i]->pivot->is_sell == 1){
                 $user_info["Trades"][$i]["Converted"] = $user->currency[$i]->pivot->quantity * $user->currency[$i]->pivot->price;
             }else{
                 $user_info["Trades"][$i]["Converted"] = $user->currency[$i]->pivot->quantity / $user->currency[$i]->pivot->price;

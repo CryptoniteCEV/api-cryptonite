@@ -33,7 +33,7 @@ class TradeController extends ApiController
                 "Profile_pic" => $trades[$i]->user->profile_pic
             ];
             
-            if($trades[$i]->is_sell == 0){
+            if($trades[$i]->is_sell == 1){
                 $info[$i]["Converted"] = $trades[$i]->quantity * $trades[$i]->price;
             }else{
                 $info[$i]["Converted"] = $trades[$i]->quantity * $trades[$i]->price;
