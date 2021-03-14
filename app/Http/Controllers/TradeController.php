@@ -36,7 +36,7 @@ class TradeController extends ApiController
             if($trades[$i]->is_sell == 1){
                 $info[$i]["Converted"] = $trades[$i]->quantity * $trades[$i]->price;
             }else{
-                $info[$i]["Converted"] = $trades[$i]->quantity * $trades[$i]->price;
+                $info[$i]["Converted"] = $trades[$i]->quantity / $trades[$i]->price;
             }
 
             if($trades[$i]->is_sell ==1){
