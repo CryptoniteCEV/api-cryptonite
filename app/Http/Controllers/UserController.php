@@ -692,9 +692,14 @@ class UserController extends ApiController
         
         if($id = in_array($request->get('id') , $user_missions_id)){
             $user_mission = userMission::where('mission_id', $request->get('id'))->where('user_id', $user->id)->firstOrFail();
-            $user_mission->is_finished = 1;
-            $user_mission->save();
-            return $this->successResponse($user_mission, "Mission Ready To Be Claimed" ,200);
+            if($user_mission->is_finished == 0){
+                $user_mission->is_finished = 1;
+                $user_mission->save();
+                return $this->successResponse($user_mission, "Mission Ready To Be Claimed" ,200);
+            }else{
+                return $this->successResponse($user_mission, "Mission already shown" ,202);
+            }
+            
         }
             
         return $this->errorResponse("Mission not active" , 300);;
