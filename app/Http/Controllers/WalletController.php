@@ -142,17 +142,17 @@ class WalletController extends ApiController
         
         for ($i=0; $i < count($info["Wallets"]); $i++) { 
             $percentage = ($info["Wallets"][$i]['Percentage'] * 100) / $cash;
+            
             $info["Wallets"][$i]['Percentage'] = $percentage;
+            
         }
-
-        
 
         $index = 0;
 
         for ($i=0; $i < count($info["Wallets"]); $i++) { 
             if($info["Wallets"][$i]['Percentage'] > 2){
-                $wallets["Wallets"][$index]['Symbol'] = $info["Wallets"][$index]['Symbol'];
-                $wallets["Wallets"][$index]['Percentage'] = $info["Wallets"][$index]['Percentage'];
+                $wallets["Wallets"][$index]['Symbol'] = $info["Wallets"][$i]['Symbol'];
+                $wallets["Wallets"][$index]['Percentage'] = $info["Wallets"][$i]['Percentage'];
                 $index += 1;
             }
         }
