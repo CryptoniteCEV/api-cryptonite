@@ -31,8 +31,9 @@ class TradeController extends ApiController
                 "Quantity" => $trades[$i]->quantity,
                 "Username" => $trades[$i]->user->username,
                 "Profile_pic" => $trades[$i]->user->profile_pic,
-                "Converted" => $trades[$i]->quantity * $trades[$i]->price,
+                "Converted" => $trades[$i]->quantity / $trades[$i]->price
             ];
+            
             if($trades[$i]->is_sell ==1){
                 $info[$i]["Coin_from"] = $trades[$i]->currency->name;
                 $info[$i]["Coin_from_symbol"] = $trades[$i]->currency->symbol;
