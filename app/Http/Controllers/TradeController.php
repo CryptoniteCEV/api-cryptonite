@@ -23,7 +23,8 @@ class TradeController extends ApiController
     public function trade_history()
     {
         $info = [];
-        $trades = trade::all();
+        //$trades = trade::all();
+        $trades = trade::orderBy('creater_at')->get();
         
         for ($i=0; $i < count($trades); $i++) { 
             $info[$i] = [
