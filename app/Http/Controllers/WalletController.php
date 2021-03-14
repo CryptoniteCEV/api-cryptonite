@@ -145,6 +145,8 @@ class WalletController extends ApiController
             $info["Wallets"][$i]['Percentage'] = $percentage;
         }
 
+        
+
         $index = 0;
 
         for ($i=0; $i < count($info["Wallets"]); $i++) { 
