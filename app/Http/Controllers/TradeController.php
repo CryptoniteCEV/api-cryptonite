@@ -24,7 +24,7 @@ class TradeController extends ApiController
     {
         $info = [];
        
-        $trades = trade::orderBy('created_at')->get();
+        $trades = trade::orderBy('created_at', 'desc')->get();
         
         for ($i=0; $i < count($trades); $i++) { 
             $info[$i] = [
