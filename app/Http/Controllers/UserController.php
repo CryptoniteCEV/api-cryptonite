@@ -564,15 +564,17 @@ class UserController extends ApiController
         $headers = getallheaders();
         $jwt = Token::get_token_from_headers($headers);
         $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
-        
+        $index = 0;
         for ($i=0; $i < count($users); $i++) { 
-
+            
             if($decoded->username != $users[$i]->username){
-                $response[$i] = [
+                
+                $response[$index] = [
                     "Username" => $users[$i]->username,
                     "Exp" => $users[$i]->score->experience,
                     "ProfilePic" => $users[$i]->profile_pic
                 ];
+                $index += 1;
             }
         }
         return $this->successResponse($response, 201);
