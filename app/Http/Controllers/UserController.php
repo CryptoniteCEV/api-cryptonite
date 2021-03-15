@@ -502,14 +502,17 @@ class UserController extends ApiController
         $wallet_crypto->quantity += $quantity_crypto;
         $wallet_dollar->quantity += $quantity_dollar;
 
+        $wallet_crypto->save();
+
         if($wallet_dollar->quantity < 2){
             $wallet_dollar->quantity = 0;
         }
+
         if(CoinGecko::convert_quantity($currency, $wallet_crypto->quantity, $is_sell) < 2){
             $wallet_crypto->quantity = 0;
+            $wallet_crypto->save();
         }
 
-        $wallet_crypto->save();
         $wallet_dollar->save();
     }
 
