@@ -404,6 +404,9 @@ class UserController extends ApiController
     public function trade_coin(Request $request){
 
         $quantity = $request->get('quantity');
+        $fee = 0.5 * $quantity/100;
+        $quantity = $quantity - $fee;
+
         $is_sell = $request->get('is_sell');
         $coin = $request->get('coin');
 
@@ -464,7 +467,7 @@ class UserController extends ApiController
                 }catch(\Exception $e){
                     return $this->errorResponse("Wallet not found",401);
                 }
-                $this->modify_wallet_quantities($wallet_crypto, $wallet_dollar, $quantity, $converted_quantity);
+                $this->modify_wallet_quantities($wallet_crypto, $wallet_dollar, $quantity, $converted_quantity, $is_sell, $currency->name);
             }
         }else{
             $quantity = - $quantity;
@@ -477,8 +480,9 @@ class UserController extends ApiController
                 return $this->errorResponse('No funds on this coin',422);
             }
                 $wallet_crypto = wallet::find($coins_held[$coin_position]['id']);
-                $this->modify_wallet_quantities($wallet_crypto, $wallet_dollar, $converted_quantity,$quantity);
+                $this->modify_wallet_quantities($wallet_crypto, $wallet_dollar, $converted_quantity,$quantity, $is_sell, $currency->name);
         }
+
         $trade = new trade();
         $trade->price = $price;
         $trade->quantity = abs($quantity);
@@ -493,10 +497,18 @@ class UserController extends ApiController
 
     }
 
-    public function modify_wallet_quantities($wallet_crypto, $wallet_dollar, $quantity_crypto, $quantity_dollar){
+    public function modify_wallet_quantities($wallet_crypto, $wallet_dollar, $quantity_crypto, $quantity_dollar, $is_sell, $currency){
 
         $wallet_crypto->quantity += $quantity_crypto;
         $wallet_dollar->quantity += $quantity_dollar;
+
+        if($wallet_dollar->quantity < 2){
+            $wallet_dollar->quantity = 0;
+        }
+        if(CoinGecko::convert_quantity($currency, $wallet_crypto->quantity, $is_sell) < 2){
+            $wallet_crypto->quantity = 0;
+        }
+
         $wallet_crypto->save();
         $wallet_dollar->save();
     }
