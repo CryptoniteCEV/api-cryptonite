@@ -768,6 +768,34 @@ class UserController extends ApiController
         return $this->successResponse($gamification ,200);
     }
 
+    public function getMissions(){
+
+        $gamification = [];
+        $headers = getallheaders();
+        $jwt = Token::get_token_from_headers($headers);
+        $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
+
+        try{
+            $user = user::findOrFail($decoded->id);
+        }catch(\Exception $e){
+            return $this->errorResponse("User not found",401);
+        }
+
+        $userMissions = $user->mission;
+
+        for ($i=0; $i <count($userMissions) ; $i++) { 
+            
+            $gamification["Missions"][$i] = [
+                "id" => $userMissions[$i]->id,
+                "is_finished" => $userMissions[$i]->pivot->is_finished,
+                "icon" => $userMissions[$i]->icon,
+                "description" => $userMissions[$i]->description
+            ];
+        }
+
+        return $this->successResponse($gamification ,200);
+    }
+
     
 }
  

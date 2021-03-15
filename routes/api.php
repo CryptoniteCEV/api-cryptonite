@@ -33,6 +33,7 @@ Route::prefix('users')->group(function () {
 	Route::post('/assign/mission',[UserController::class, 'assignNewRandMission'])->middleware('EnsureTokenIsValid');
 	Route::post('/update/mission',[UserController::class, 'updateMission'])->middleware('EnsureTokenIsValid');
 	Route::get('/gamification',[UserController::class, 'getUserGamification'])->middleware('EnsureTokenIsValid');
+	Route::get('/missions',[UserController::class, 'getMissions'])->middleware('EnsureTokenIsValid');
 	
 });
 
