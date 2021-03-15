@@ -785,7 +785,7 @@ class UserController extends ApiController
 
         for ($i=0; $i <count($userMissions) ; $i++) { 
             
-            $gamification["Missions"][$i] = [
+            $gamification[$i] = [
                 "id" => $userMissions[$i]->id,
                 "is_finished" => $userMissions[$i]->pivot->is_finished,
                 "icon" => $userMissions[$i]->icon,
