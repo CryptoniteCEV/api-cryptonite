@@ -50,6 +50,7 @@ Route::prefix('wallets')->group(function () {
 	Route::get('/cash',[WalletController::class, 'get_total_cash'])->middleware('EnsureTokenIsValid'); // Done
 	Route::get('/percentages',[WalletController::class, 'get_percentages'])->middleware('EnsureTokenIsValid'); // Done
 	Route::put('/deposit/doge',[WalletController::class, 'depositDoge'])->middleware('EnsureTokenIsValid'); // Done
+	Route::get('/percentages/own',[WalletController::class, 'get_own_percentages'])->middleware('EnsureTokenIsValid'); // Done
 });
 
 Route::prefix('coins')->group(function () {

@@ -161,6 +161,56 @@ class WalletController extends ApiController
         
     }
 
+    public function get_own_percentages(Request $request){
+
+        $info = [];
+        $cash = 0;
+        $headers = getallheaders();
+        $jwt = Token::get_token_from_headers($headers);
+        $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
+        $user = user::findOrFail($decoded->id);
+        $index = 0;
+        $wallets = [];
+
+        for ($i=0; $i < count($user->wallet); $i++) { 
+            if($user->wallet[$i]->pivot->quantity > 0){
+                $info["Wallets"][$index] = [
+                    "Symbol" => $user->wallet[$i]->symbol
+                ];
+
+                if($user->wallet[$i]->name == "Tether"){
+                    $info["Wallets"][$index]['Percentage'] = $user->wallet[$i]->pivot->quantity;
+                    $cash += $user->wallet[$i]->pivot->quantity;
+                }else{
+                    $info["Wallets"][$index]['Percentage'] = CoinGecko::convert_quantity($user->wallet[$i]->name, $user->wallet[$i]->pivot->quantity , 1);
+                    $cash += $info["Wallets"][$index]['Percentage'];
+                }
+                $index += 1;
+            }
+            
+        } 
+        
+        for ($i=0; $i < count($info["Wallets"]); $i++) { 
+            $percentage = ($info["Wallets"][$i]['Percentage'] * 100) / $cash;
+            
+            $info["Wallets"][$i]['Percentage'] = $percentage;
+            
+        }
+
+        $index = 0;
+
+        for ($i=0; $i < count($info["Wallets"]); $i++) { 
+            if($info["Wallets"][$i]['Percentage'] > 2){
+                $wallets["Wallets"][$index]['Symbol'] = $info["Wallets"][$i]['Symbol'];
+                $wallets["Wallets"][$index]['Percentage'] = $info["Wallets"][$i]['Percentage'];
+                $index += 1;
+            }
+        }
+
+        return $this->successResponse($wallets ,201);
+        
+    }
+
     public function depositDoge(Request $request){
 
         $headers = getallheaders();
