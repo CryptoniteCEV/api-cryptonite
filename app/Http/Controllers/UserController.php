@@ -467,7 +467,7 @@ class UserController extends ApiController
                 }catch(\Exception $e){
                     return $this->errorResponse("Wallet not found",401);
                 }
-                $this->modify_wallet_quantities($wallet_crypto, $wallet_dollar, $quantity, $converted_quantity, $is_sell, $currency->name);
+                $this->modify_wallet_quantities($wallet_crypto, $wallet_dollar, $quantity, $converted_quantity, $currency->name);
             }
         }else{
             $quantity = - $quantity;
@@ -480,7 +480,7 @@ class UserController extends ApiController
                 return $this->errorResponse('No funds on this coin',422);
             }
                 $wallet_crypto = wallet::find($coins_held[$coin_position]['id']);
-                $this->modify_wallet_quantities($wallet_crypto, $wallet_dollar, $converted_quantity,$quantity, $is_sell, $currency->name);
+                $this->modify_wallet_quantities($wallet_crypto, $wallet_dollar, $converted_quantity,$quantity, $currency->name);
         }
 
         $trade = new trade();
@@ -497,7 +497,7 @@ class UserController extends ApiController
 
     }
 
-    public function modify_wallet_quantities($wallet_crypto, $wallet_dollar, $quantity_crypto, $quantity_dollar, $is_sell, $currency){
+    public function modify_wallet_quantities($wallet_crypto, $wallet_dollar, $quantity_crypto, $quantity_dollar, $currency){
 
         $wallet_crypto->quantity += $quantity_crypto;
         $wallet_dollar->quantity += $quantity_dollar;
@@ -508,7 +508,7 @@ class UserController extends ApiController
             $wallet_dollar->quantity = 0;
         }
 
-        if(CoinGecko::convert_quantity($currency, $wallet_crypto->quantity, $is_sell) < 2){
+        if(CoinGecko::convert_quantity($currency, $wallet_crypto->quantity, 1) < 2){
             $wallet_crypto->quantity = 0;
             $wallet_crypto->save();
         }
