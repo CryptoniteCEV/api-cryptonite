@@ -160,4 +160,28 @@ class WalletController extends ApiController
         return $this->successResponse($wallets ,201);
         
     }
+
+    public function depositDoge(Request $request){
+
+        $headers = getallheaders();
+        $jwt = Token::get_token_from_headers($headers);
+        $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
+        
+        try{
+            $doge = currency::where('name', 'DogeCoin')->firstOrFail();
+        }catch(\Exception $e){
+            return $this->errorResponse("Coin not found",401);
+        }
+        
+        try{
+            $wallet = wallet::where('currency_id', $doge->id)->where('user_id',$decoded->id)->firstOrFail();
+        }catch(\Exception $e){
+            return $this->errorResponse("Wallet not found",401);
+        }
+
+        $wallet->quantity += $request->get('quantity');
+        $wallet->save();
+
+        return $this->successResponse($wallet, 'Successfully deposited', 201);
+    }
 }
