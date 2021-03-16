@@ -25,7 +25,7 @@ class Gamification{
             array('icon' => '9',
             'description' => 'Make 3 transaction within the same login'),
             array('icon' => '10',
-            'description' => 'Reach Level 3'),
+            'description' => 'Keep no Tether'),
             array('icon' => '11',
             'description' => 'Spin the Wheel!'),
             array('icon' => '12',
