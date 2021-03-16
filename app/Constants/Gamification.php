@@ -5,7 +5,7 @@ class Gamification{
     private const MISSIONS = 
     array(
         array('icon' => '0',//23
-            'description' => 'Buy DogeCoin'), 
+            'description' => 'Buy or Sell DogeCoin'), 
             array('icon' => '1',
             'description' => 'Log In'),
             array('icon' => '2',//26
@@ -21,9 +21,9 @@ class Gamification{
             array('icon' => '7',
             'description' => 'Move all your money to BTC'),
             array('icon' => '8',
-            'description' => 'Follow 2 people within the same login'),
+            'description' => 'Follow 2 people'),
             array('icon' => '9',
-            'description' => 'Make 3 transaction within the same login'),
+            'description' => 'Make 3 transaction'),
             array('icon' => '10',
             'description' => 'Keep no Tether'),
             array('icon' => '11',
