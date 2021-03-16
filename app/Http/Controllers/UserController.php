@@ -404,7 +404,7 @@ class UserController extends ApiController
     public function trade_coin(Request $request){
 
         $quantity = $request->get('quantity');
-        $fee = 0.5 * $quantity/100;
+        $fee = 0.1 * $quantity/100;
         $quantity = $quantity - $fee;
 
         $is_sell = $request->get('is_sell');
