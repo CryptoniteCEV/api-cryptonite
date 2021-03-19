@@ -54,7 +54,7 @@ class WalletController extends ApiController
         $wallet->quantity += $request->get('quantity');
         $wallet->save();
 
-        return $this->successResponse($wallet, 'Successfully deposited', 201);
+        return $this->successResponse($wallet, 'Successfully deposited', 200);
     }
 
     /**GET
@@ -90,7 +90,7 @@ class WalletController extends ApiController
         } 
         $info["Cash"] = $cash;
 
-        return $this->successResponse($info ,201);
+        return $this->successResponse($info ,200);
     }
 
     public function get_total_cash(){
@@ -111,7 +111,7 @@ class WalletController extends ApiController
             }
         } 
         
-        return $this->successResponse((String)$cash ,201);
+        return $this->successResponse((String)$cash ,200);
     }
 
     public function get_percentages(Request $request){
@@ -157,7 +157,7 @@ class WalletController extends ApiController
             }
         }
 
-        return $this->successResponse($wallets ,201);
+        return $this->successResponse($wallets ,200);
         
     }
 
@@ -207,7 +207,7 @@ class WalletController extends ApiController
             }
         }
 
-        return $this->successResponse($wallets ,201);
+        return $this->successResponse($wallets ,200);
         
     }
 
@@ -232,6 +232,6 @@ class WalletController extends ApiController
         $wallet->quantity += $request->get('quantity');
         $wallet->save();
 
-        return $this->successResponse($wallet, 'Successfully deposited', 201);
+        return $this->successResponse($wallet, 'Successfully deposited', 200);
     }
 }

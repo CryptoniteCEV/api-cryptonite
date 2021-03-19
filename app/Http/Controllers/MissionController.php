@@ -21,7 +21,7 @@ class MissionController extends ApiController
                 'description' => $mission['description']
             ]);
         }
-        return $this->successResponse($response,'Missions created', 201);
+        return $this->successResponse($response,'Missions created', 200);
     }
 
 

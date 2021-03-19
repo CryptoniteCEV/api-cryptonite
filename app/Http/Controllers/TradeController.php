@@ -52,7 +52,7 @@ class TradeController extends ApiController
             }
         }
             
-        return $this->successResponse($info, 201);
+        return $this->successResponse($info, 200);
     }
     
 }

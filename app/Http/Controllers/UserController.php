@@ -64,7 +64,7 @@ class UserController extends ApiController
         InitiateEntry::score($user->id);
         InitiateEntry::wallet($user->id);
         InitiateEntry::missions($user->id);
-        return $this->successResponse($user,'User Created', 201);
+        return $this->successResponse($user,'User Created', 200);
     }
 
     /** POST
@@ -304,7 +304,7 @@ class UserController extends ApiController
             ];
         }
 
-        return $this->successResponse($response, 201);
+        return $this->successResponse($response, 200);
     }
 
     /**GET
@@ -339,7 +339,7 @@ class UserController extends ApiController
             ];
         }
 
-        return $this->successResponse($response, 201);
+        return $this->successResponse($response, 200);
     }
 
     /**PUT
@@ -377,7 +377,7 @@ class UserController extends ApiController
 
         $score->experience = $request->get('new_exp');
         $score->save();
-        return $this->successResponse($score,"Exp. updated", 201);
+        return $this->successResponse($score,"Exp. updated", 200);
     }
 
     public function getUserExperience(){
@@ -559,7 +559,7 @@ class UserController extends ApiController
         
         
         
-        return $this->successResponse($user_info, 201);
+        return $this->successResponse($user_info, 200);
     }
 
     /**
@@ -587,7 +587,7 @@ class UserController extends ApiController
             $user_info[$i]["Date"] = $user->currency[$i]->pivot->date;
         }
         
-        return $this->successResponse($user_info, 201);
+        return $this->successResponse($user_info, 200);
     }
 
     public function get_users(){
@@ -611,7 +611,7 @@ class UserController extends ApiController
                 $index += 1;
             }
         }
-        return $this->successResponse($response, 201);
+        return $this->successResponse($response, 200);
         
     }
 
@@ -653,7 +653,7 @@ class UserController extends ApiController
 
         $followings->delete();
 
-        return $this->successResponse($followings, "You are not following " . $following->username . " anymore"  ,201);
+        return $this->successResponse($followings, "You are not following " . $following->username . " anymore"  ,200);
 
     }
 
@@ -711,7 +711,7 @@ class UserController extends ApiController
             $all_missions[$i + 1]["description"] = $userMissions[$i]->description;
         }
 
-        return $this->successResponse($all_missions, "Mission deleted, new mission assigned" ,201);
+        return $this->successResponse($all_missions, "Mission deleted, new mission assigned" ,200);
     }
 
     public function updateMission(Request $request){
