@@ -39,11 +39,11 @@ class UserController extends ApiController
     /**POST
      * Registro de usuarios en la app. /users/register 
      *
-     * Llega en la petición el username, email y contraseña, nombre y apellidos y ¿fecha de nacimiento?
+     * Llega en la petición el username, email y contraseña, nombre y profile pic
      * Añade el nuevo usuario en la base de daos si la información es correcta.
      * 
      * @param $request Petición con los datos del usuario
-     * @return $response respuesta de la api OK/NOOK
+     * @return $response respuesta de la api OK
      */
     public function register(Request $request){
 
@@ -187,7 +187,6 @@ class UserController extends ApiController
             return $this->errorResponse("User not found",401);
         }
         
-
         $response = [
             "username" => $user->username,
             "name" => $user->name,
@@ -237,8 +236,8 @@ class UserController extends ApiController
     /**POST
      * Seguir a un usuario. /users/follow/{username}
      * 
-     * Llega por url el nombre de usuario al que se va a seguir y se decodifica el token para obtener
-     * el id del usuario que va a seguir. Se crea la fila en la tambla de followings.
+     * Llega por param el nombre de usuario al que se va a seguir y se decodifica el token para obtener
+     * el id del usuario que va a seguir. Se crea la fila en la tabla de followings.
      * 
      * @param $request
      * @param $username Nombre del usuario al que se va a seguir
@@ -345,7 +344,7 @@ class UserController extends ApiController
     /**PUT
      * Actualizar la experiencia del usuario. /users/update/score
      *
-     * Obtiene el usuario por su token y actualiza su experiencia (xp) que llega por url
+     * Obtiene el usuario por su token y actualiza su experiencia (xp) que llega por params
      * en la tabla de scores.
      *
      * @param $request
@@ -380,6 +379,9 @@ class UserController extends ApiController
         return $this->successResponse($score,"Exp. updated", 200);
     }
 
+    /**
+     * Recoge y devuelve la experiencia actual del usuario recibido por token
+     */
     public function getUserExperience(){
 
         $headers = getallheaders();
@@ -397,8 +399,7 @@ class UserController extends ApiController
     }
 
     /**POST
-     * Vender cantidad de cryptos que posea el usuario en su wallet
-     * Falta hacer que se pueda comprar
+     * Compra venta de monedas con un fee que se encargará de evitar problemas de fluctuaciones
      * 
      */
     public function trade_coin(Request $request){
@@ -497,6 +498,7 @@ class UserController extends ApiController
 
     }
 
+    //Actualiza los wallets modificados
     public function modify_wallet_quantities($wallet_crypto, $wallet_dollar, $quantity_crypto, $quantity_dollar, $currency){
 
         $wallet_crypto->quantity += $quantity_crypto;
@@ -517,7 +519,7 @@ class UserController extends ApiController
     }
 
     /**
-     * GET info de usuario y sus tradeos
+     * GET info de usuario pasado por params y sus tradeos
      */
     public function trades_profile_info(Request $request){
 
@@ -557,13 +559,11 @@ class UserController extends ApiController
             }
         }
         
-        
-        
         return $this->successResponse($user_info, 200);
     }
 
     /**
-     * GET info de usuario y sus tradeos
+     * GET info de usuario recibido por token y sus tradeos
      */
     public function trades_info(Request $request){
 
@@ -590,6 +590,9 @@ class UserController extends ApiController
         return $this->successResponse($user_info, 200);
     }
 
+    /**
+     * Recoge y devuelve todos los usuarios
+     */
     public function get_users(){
         
         $response = [];
@@ -615,6 +618,9 @@ class UserController extends ApiController
         
     }
 
+    /**
+     * Devuelve la informacion del usuario pasado por param
+     */
     public function user_info(Request $request){
 
         try{
@@ -632,6 +638,9 @@ class UserController extends ApiController
         return $this->successResponse($response);
     }
 
+    /**
+     * Unfollow de la persona pasada por param
+     */
     public function stopFollowing(Request $request){
 
         $headers = getallheaders();
@@ -657,6 +666,9 @@ class UserController extends ApiController
 
     }
 
+    /**
+     * Asigna una nueva mision aleatoria al usuario pasado por token ademas de eliminar la ya comlpletada recibida por token
+     */
     public function assignNewRandMission(Request $request){
 
         $headers = getallheaders();
@@ -714,6 +726,9 @@ class UserController extends ApiController
         return $this->successResponse($all_missions, "Mission deleted, new mission assigned" ,200);
     }
 
+    /**
+     * Actualiza el estado de la mission que se acaba de completar en caso de sea ua de las 3 poseidas por el usuario
+     */
     public function updateMission(Request $request){
 
         $headers = getallheaders();
@@ -749,6 +764,9 @@ class UserController extends ApiController
         
     }
 
+    /**
+     * Devuelve toda la información del usuario y sus misiones util para la pantalla de gamificacion
+     */
     public function getUserGamification(){
 
         $gamification = [];
@@ -783,6 +801,9 @@ class UserController extends ApiController
         return $this->successResponse($gamification ,200);
     }
 
+    /**
+     * Devielve todas las misiones del usuario pasado por token
+     */
     public function getMissions(){
 
         $gamification = [];

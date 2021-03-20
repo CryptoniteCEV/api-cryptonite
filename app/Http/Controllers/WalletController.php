@@ -23,7 +23,7 @@ class WalletController extends ApiController
      * Depositar una cantidad de "x" moneda en la cartera del usuario /wallets/deposit
      *
      * Busca al usuario por su api_token, recibe en la petición la currency que se va a 
-     * depositar y la cantidad, y se añade a la tabla wallet añadiendo ademas el user_id
+     * depositar y la cantidad
      *
      * @param $request La petición con los datos del deposito
      * @return $response Confirmación del depósito
@@ -33,12 +33,6 @@ class WalletController extends ApiController
         $headers = getallheaders();
         $jwt = Token::get_token_from_headers($headers);
         $decoded = JWT::decode($jwt, env('PRIVATE_KEY'),array("HS256"));
-        
-        /*$validator = ValidateWallet::validate_create();
-        
-        if ($validator->fails()){
-            return $this->errorResponse($validator->messages(), 422);
-        }*/
         
         try{
             $dollar = currency::where('name', 'tether')->firstOrFail();
@@ -60,10 +54,7 @@ class WalletController extends ApiController
     /**GET
      * Recibe la información de la cartera del usuario. /wallets/info
      *
-     * Busca al usuario por su api_token, si tiene alguna cryptomoneda, busca los
-     * datos en la tabla wallet y devuelve el nombre de la moneda y la cantidad de la misma
-     *
-     * @return $response en caso de que tenga alguna cryptomoneda, devuelve los datos de la cartera del usuario
+     * Devuelve todas las monedas y sus cantidades del usuario recibido en token
      */
     public function wallet_info(){
         $info = [];
@@ -93,6 +84,9 @@ class WalletController extends ApiController
         return $this->successResponse($info ,200);
     }
 
+    /**
+     * Calcula y devuelve el cash total de un usuario
+     */
     public function get_total_cash(){
         $info = [];
         $headers = getallheaders();
@@ -114,6 +108,9 @@ class WalletController extends ApiController
         return $this->successResponse((String)$cash ,200);
     }
 
+    /**
+     * calcula y devuelve los porcentajes de un usuario recibido en params
+     */
     public function get_percentages(Request $request){
 
         $info = [];
@@ -161,6 +158,9 @@ class WalletController extends ApiController
         
     }
 
+    /**
+     * Calcula y devuelve los porcentajes que posee de cada moneda el usuario recibido en el token
+     */
     public function get_own_percentages(Request $request){
 
         $info = [];
@@ -210,7 +210,9 @@ class WalletController extends ApiController
         return $this->successResponse($wallets ,200);
         
     }
-
+    /**
+     * Deposita doges en el usuario recibido en el token
+     */
     public function depositDoge(Request $request){
 
         $headers = getallheaders();

@@ -10,8 +10,10 @@ use App\Constants\Gamification;
 
 class MissionController extends ApiController
 {
-    //
-
+    
+    /**
+     * Genera las missiones en la base de datos
+     */
     public function generate_missions(){
         $gamification = new Gamification();
         $missions = $gamification->get_all();

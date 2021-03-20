@@ -52,6 +52,7 @@ class Handler extends ExceptionHandler
         });*/
     }
 
+    //comprobación de diferentes errores que puedan ocurrir
     public function handleException($request, Exception $exception)
     {
         if ($exception instanceof MethodNotAllowedHttpException) {

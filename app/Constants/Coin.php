@@ -16,6 +16,7 @@ class Coin{
             'symbol' => 'LTC')
     );
 
+    //Devuelve la los valores de la constante cryptos
     Public function get_all(){
 
         return self::CRYPTOS;

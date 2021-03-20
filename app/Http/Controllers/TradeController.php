@@ -13,7 +13,7 @@ use App\Helpers\CoinGecko;
 class TradeController extends ApiController
 {
     /**GET
-     * Ver la lista de trades de un usuario
+     * Ver la lista de trades general
      * 
      * Muestra la lista de trades global. Lo busca por el token y devuelve el nombre de la moneda
      * comprada o vendida, el precio al que se realizó la transacción y la cantidad

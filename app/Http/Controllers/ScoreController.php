@@ -12,7 +12,7 @@ use \Firebase\JWT\JWT;
 class ScoreController extends Controller
 {
     /**GET
-     * Retrives a list of all the scores ordered by experience bigger->lower
+     * Devuelve la lista de puntuaciones
      *
      * @return $response List of the scores
      */

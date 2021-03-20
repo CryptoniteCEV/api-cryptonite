@@ -54,7 +54,7 @@ class CurrencyController extends ApiController
     /**GET
      * Devuelve lista de monedas en forma de Json. /currencies/list
      *
-     * Recoge todos los datos de la tabla currencies para mostrar todas las cryptomonedas
+     * Recoge todos los datos de la tabla currencies para devolver todas las cryptomonedas
      * disponibles en la abse de datos.
      *
      * return $response Lista de monedas
@@ -85,6 +85,9 @@ class CurrencyController extends ApiController
         return $this->successResponse($response, 200);
     }
 
+    /**
+     * Devuelve las monedas y la cantidad que posee el wallet
+     */
     public function get_coins_with_quantities(){
 
         $response = [];
@@ -113,6 +116,9 @@ class CurrencyController extends ApiController
         return $this->successResponse($response, 200);
     }
 
+    /**
+     * Devuelve el precio de la moneda recibida por param
+     */
     public function get_price(Request $request){
 
         $currentPrice = CoinGecko::getPrice($request->get('coin'), 'usd');
@@ -120,6 +126,9 @@ class CurrencyController extends ApiController
         return $this->successResponse($currentPrice, 200);
     }
 
+    /**
+     * Devuelve la info de la moneda especificada, volume, change y market cap
+     */
     public function get_info(Request $request){
 
         try{
@@ -142,6 +151,9 @@ class CurrencyController extends ApiController
         return $this->successResponse($coin, 200);
     }
 
+    /**
+     * Convierte la cantidad de cierta moneda a crypto o a dollar dependiendo de si es compra o venta
+     */
     public function convert_quantity(Request $request){
 
         $converted_quantity = CoinGecko::convert_quantity($request->get('coin'), $request->get('quantity') , $request->get('is_sell'));
@@ -149,6 +161,9 @@ class CurrencyController extends ApiController
         return $this->successResponse($converted_quantity, 200);
     }
 
+    /**
+     * Devuelve el historial de los ultimos 30 dias de una moneda
+     */
     public function get_coin_history(Request $request){
 
         $coin_history = CoinGecko::getMarketChart($request->get('coin'));

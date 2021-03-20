@@ -34,6 +34,7 @@ class Gamification{
             'description' => 'Check Your Wallet')
     );
 
+    //Devuelve la los valores de la constante missions
     Public function get_all(){
 
         return self::MISSIONS;

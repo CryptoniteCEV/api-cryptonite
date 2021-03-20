@@ -16,6 +16,9 @@ class CoinGecko{
         return $data[$coin]["usd"];
     }
 
+    /**
+     * Información especifica de la moneda buscada
+     */
     public static function getAllCoinInfo($coin){
         $client = new CoinGeckoClient();     
         $coin = strtolower($coin);
@@ -28,6 +31,9 @@ class CoinGecko{
         return $data[$coin];
     }
 
+    /**
+     * Informacion de los ultimos 30 dias de una moneda específica
+     */
     public static function getMarketChart($coin){
         $client = new CoinGeckoClient();     
         $coin = strtolower($coin);
@@ -80,6 +86,9 @@ class CoinGecko{
         return $response;
     }
 
+    /**
+     * Convierte la cantidad entre cryptos y dollar dependiendo de si es compra o venta
+     */
     public static function convert_quantity($coin, $quantity, $is_sell){
         $client = new CoinGeckoClient();
         $coinPrice = self::getPrice($coin, "usd");

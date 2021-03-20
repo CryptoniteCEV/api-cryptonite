@@ -13,7 +13,6 @@ use App\Constants\Coin;
 class InitiateEntry{
 
     public static function user($name, $password, $email, $username, $profile_pic){
-        //price es el precio en dollars no quantity
         return user::create([
             'name' => $name,
             'password' => Hash::make($password),
@@ -24,7 +23,6 @@ class InitiateEntry{
     }
 
     public static function trade($user_id, $currency_id, $is_sell, $price, $quantity, $date){
-        //price es el precio en dollars no quantity
         return trade::create([
             'price' => $price,
             'quantity' => $quantity,
